@@ -3,7 +3,7 @@ import settings
 import functions
 from classes import Button, TextField
 import random
-from time import sleep
+import time
 pygame.init()
 
 
@@ -71,8 +71,8 @@ def training_menu():
 
 
 def get_equation():
-    x = random.randint(0, 10)
-    y = random.randint(0, 10)
+    x = random.randint(10, 100)
+    y = random.randint(10, 100)
     result = x + y
     return x, y, result
 
@@ -108,13 +108,14 @@ def game():
     equations = iter([get_equation() for _ in range(n)])
     current_equation = next(equations)
     last_answer_time = 0
-    show_result_color = 100
-    while run:
-        if pygame.time.get_ticks() - last_answer_time < show_result_color:
-            screen.fill(background_color)
-        else:
-            screen.fill(settings.colors.BACKGROUND)
+    background_color = list(settings.colors.BACKGROUND)
+    color_step = int((255 - background_color[1])/n) 
 
+    start = time.time()
+
+    while run:
+        elapsed_time = f'{time.time() - start:.2f}'
+        screen.fill(background_color)
         functions.draw_text("Game", settings.main_font, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 70, screen) 
         for event in pygame.event.get():
             input_field.get_event(event)
@@ -123,13 +124,18 @@ def game():
             if pygame.time.get_ticks() - last_answer_time > 100:
                 if answer_button.check_clicked(event):
                     if check_equation(input_field.user_input, current_equation[-1]):
-                        background_color = settings.colors.LIGHT_GREEN
+                        background_color[0] = max(background_color[0] - color_step, 0)
+                        background_color[1] = min(background_color[1] + color_step, 255)
+                        background_color[2] = max(background_color[2] - color_step, 0)
                         try:
                             current_equation = next(equations)
                         except StopIteration as e:
-                            results()
+                            results(background_color, elapsed_time)
                     else:
-                        background_color = settings.colors.LIGHT_RED
+                        background_color[0] = min(background_color[0] + color_step, 255)
+                        background_color[1] = max(background_color[1] - color_step, 0)
+                        background_color[2] = max(background_color[2] - color_step, 0)
+
                     input_field.user_input = ''
                     last_answer_time = pygame.time.get_ticks()
 
@@ -142,10 +148,11 @@ def game():
         input_field.update(screen)
         answer_button.draw(screen)
         functions.draw_text(f"{current_equation[0]} + {current_equation[1]}", settings.main_font_small, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 300, screen)
+        functions.draw_text(elapsed_time, settings.main_font_small, settings.colors.BLACK, 100, 30, screen, center=False)
 
         pygame.display.update()
 
-def results():
+def results(background_color, elapsed_time):
     run = True
     
     try_again_button = Button(text="Try again", 
@@ -159,8 +166,8 @@ def results():
                              y=250,
                              active=True)
     while run:
-        screen.fill(settings.colors.BACKGROUND)
-        functions.draw_text("Results", settings.main_font, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 70, screen) 
+        screen.fill(background_color)
+        functions.draw_text(elapsed_time, settings.main_font, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 70, screen) 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
