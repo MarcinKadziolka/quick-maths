@@ -109,7 +109,8 @@ def game():
     current_equation = next(equations)
     last_answer_time = 0
     background_color = list(settings.colors.BACKGROUND)
-    color_step = int((255 - background_color[1])/n) 
+    red_step = int((background_color[0])/n) 
+    green_step = int((255 - background_color[1])/n) 
 
     start = time.time()
 
@@ -124,17 +125,17 @@ def game():
             if pygame.time.get_ticks() - last_answer_time > 100:
                 if answer_button.check_clicked(event):
                     if check_equation(input_field.user_input, current_equation[-1]):
-                        background_color[0] = max(background_color[0] - color_step, 0)
-                        background_color[1] = min(background_color[1] + color_step, 255)
-                        background_color[2] = max(background_color[2] - color_step, 0)
+                        background_color[0] = max(background_color[0] - green_step, 0)
+                        background_color[1] = min(background_color[1] + green_step, 255)
+                        background_color[2] = max(background_color[2] - green_step, 0)
                         try:
                             current_equation = next(equations)
                         except StopIteration as e:
                             results(background_color, elapsed_time)
                     else:
-                        background_color[0] = min(background_color[0] + color_step, 255)
-                        background_color[1] = max(background_color[1] - color_step, 0)
-                        background_color[2] = max(background_color[2] - color_step, 0)
+                        background_color[0] = min(background_color[0] + red_step, 255)
+                        background_color[1] = max(background_color[1] - red_step, 0)
+                        background_color[2] = max(background_color[2] - red_step, 0)
 
                     input_field.user_input = ''
                     last_answer_time = pygame.time.get_ticks()
