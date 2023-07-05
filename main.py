@@ -4,6 +4,7 @@ import functions
 from classes import Button, TextField
 import random
 import time
+import random
 pygame.init()
 
 
@@ -23,7 +24,9 @@ def main_menu():
                              shadow_color=settings.colors.BLACK, 
                              x=settings.SCREEN_WIDTH/2, 
                              y=250,
-                             active=True)
+                             active=True,
+                             inactive_color=settings.colors.WHITE)
+
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text("QuickMaths", settings.main_font, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 70, screen) 
@@ -46,41 +49,120 @@ def training_menu():
     
     start_button = Button(text="Start", 
                           font=settings.main_font_small, 
-                          width=200, 
+                          width=400, 
                           height=50, 
                           color=settings.colors.WHITE, 
                           text_color=settings.colors.BLACK, 
                           shadow_color=settings.colors.BLACK, 
                           x=settings.SCREEN_WIDTH/2, 
-                          y=settings.SCREEN_HEIGHT/2,
-                          active=True)
+                          y=700,
+                          active=True,
+                          inactive_color=settings.colors.WHITE)
+
+
+    addition_button = Button(text="Addition", 
+                          font=settings.main_font_small, 
+                          width=400, 
+                          height=50, 
+                          color=settings.colors.WHITE, 
+                          text_color=settings.colors.BLACK, 
+                          shadow_color=settings.colors.BLACK, 
+                          x=settings.SCREEN_WIDTH/2, 
+                          y=300,
+                          active=False,
+                          inactive_color=settings.colors.GRAY)
+
+    subtraction_button = Button(text="Subtraction", 
+                          font=settings.main_font_small, 
+                          width=400, 
+                          height=50, 
+                          color=settings.colors.WHITE, 
+                          text_color=settings.colors.BLACK, 
+                          shadow_color=settings.colors.BLACK, 
+                          x=settings.SCREEN_WIDTH/2, 
+                          y=400,
+                          active=False,
+                          inactive_color=settings.colors.GRAY)
+
+
+    multiplication_button = Button(text="Multiplication", 
+                          font=settings.main_font_small, 
+                          width=400, 
+                          height=50, 
+                          color=settings.colors.WHITE, 
+                          text_color=settings.colors.BLACK, 
+                          shadow_color=settings.colors.BLACK, 
+                          x=settings.SCREEN_WIDTH/2, 
+                          y=500,
+                          active=False,
+                          inactive_color=settings.colors.GRAY)
+     
+    game_args = {}
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text("Training", settings.main_font, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 70, screen) 
         for event in pygame.event.get():
+            addition_button.check_clicked(event)
+            subtraction_button.check_clicked(event)
+            multiplication_button.check_clicked(event)
+
             if start_button.check_clicked(event):
+                game_args['mode'] = [addition_button.active, subtraction_button.active, multiplication_button.active]
                 start_button.animate(screen)
-                game()
+                game(game_args)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
             if event.type == pygame.QUIT:
                 run = False
         start_button.draw(screen)
+        addition_button.draw(screen)
+        subtraction_button.draw(screen)
+        multiplication_button.draw(screen)
         pygame.display.update()
 
 
-def get_equation():
-    x = random.randint(10, 100)
-    y = random.randint(10, 100)
-    result = x + y
-    return x, y, result
+def get_equation(operator):
+    x = random.randint(1, 10)
+    y = random.randint(1, 10)
+    if operator == '+':
+        result = x + y
+    elif operator == '-':
+        result = x - y
+    elif operator == '*':
+        result = x * y
+    return x, y, result, operator 
+
+def get_all_equations(mode, n):
+    addition, subtraction, multiplication = mode[0], mode[1], mode[2]
+    count = sum([1 for i in mode if i == True])
+    n_for_operation = n // count
+    print(n_for_operation)
+    all_equations = []
+
+    if addition:
+        for _ in range(n_for_operation):
+            all_equations.append(get_equation('+'))
+    if subtraction:
+        for _ in range(n_for_operation):
+            all_equations.append(get_equation('-'))
+    if multiplication:
+        for _ in range(n_for_operation):
+            all_equations.append(get_equation('*'))
+
+    while len(all_equations) < n:
+        operator = random.choice(['+', '-', '*'])
+        all_equations.append(get_equation(operator))
+
+    random.shuffle(all_equations)
+    print(len(all_equations))
+    return all_equations
 
 def check_equation(answer, result):
     if answer != '':
         return int(answer) == result
 
-def game():
+def game(game_args):
 
     input_field = TextField(font=settings.main_font_small, 
                             width=200,
@@ -105,7 +187,8 @@ def game():
                              function=None)
     run = True
     n = 10
-    equations = iter([get_equation() for _ in range(n)])
+
+    equations = iter(get_all_equations(game_args['mode'], n))
     current_equation = next(equations)
     last_answer_time = 0
     background_color = list(settings.colors.BACKGROUND)
@@ -114,6 +197,8 @@ def game():
 
     start = time.time()
 
+    num_equations = n 
+    current_equation_index = 1
     while run:
         elapsed_time = f'{time.time() - start:.2f}'
         screen.fill(background_color)
@@ -124,10 +209,11 @@ def game():
             # Because it sometimes triggers to fast, we wait some miliseconds
             if pygame.time.get_ticks() - last_answer_time > 100:
                 if answer_button.check_clicked(event):
-                    if check_equation(input_field.user_input, current_equation[-1]):
+                    if check_equation(input_field.user_input, current_equation[2]):
                         background_color[0] = max(background_color[0] - green_step, 0)
                         background_color[1] = min(background_color[1] + green_step, 255)
                         background_color[2] = max(background_color[2] - green_step, 0)
+                        current_equation_index += 1
                         try:
                             current_equation = next(equations)
                         except StopIteration as e:
@@ -148,7 +234,9 @@ def game():
 
         input_field.update(screen)
         answer_button.draw(screen)
-        functions.draw_text(f"{current_equation[0]} + {current_equation[1]}", settings.main_font_small, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 300, screen)
+
+        functions.draw_text(f"{current_equation_index}/{num_equations}", settings.main_font_small, settings.colors.BLACK, 1500, 30, screen)
+        functions.draw_text(f"{current_equation[0]} {current_equation[3]} {current_equation[1]}", settings.main_font_small, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 300, screen)
         functions.draw_text(elapsed_time, settings.main_font_small, settings.colors.BLACK, 100, 30, screen, center=False)
 
         pygame.display.update()
