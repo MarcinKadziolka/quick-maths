@@ -5,6 +5,7 @@ from classes import Button, TextField
 import random
 import time
 import random
+import json
 pygame.init()
 
 
@@ -17,7 +18,7 @@ def main_menu():
     
     training_button = Button(text="Training", 
                              font=settings.main_font_small, 
-                             width=200, 
+                             width=400, 
                              height=50, 
                              color=settings.colors.WHITE, 
                              text_color=settings.colors.BLACK, 
@@ -69,7 +70,7 @@ def training_menu():
                           shadow_color=settings.colors.BLACK, 
                           x=settings.SCREEN_WIDTH/2, 
                           y=300,
-                          active=False,
+                          active=True,
                           inactive_color=settings.colors.GRAY)
 
     subtraction_button = Button(text="Subtraction", 
@@ -97,6 +98,55 @@ def training_menu():
                           active=False,
                           inactive_color=settings.colors.GRAY)
      
+    five_button = Button(text="5", 
+                          font=settings.main_font_small, 
+                          width=50, 
+                          height=50, 
+                          color=settings.colors.WHITE, 
+                          text_color=settings.colors.BLACK, 
+                          shadow_color=settings.colors.BLACK, 
+                          x=1500, 
+                          y=300,
+                          active=False,
+                          inactive_color=settings.colors.GRAY)
+
+    ten_button = Button(text="10", 
+                          font=settings.main_font_small, 
+                          width=50, 
+                          height=50, 
+                          color=settings.colors.WHITE, 
+                          text_color=settings.colors.BLACK, 
+                          shadow_color=settings.colors.BLACK, 
+                          x=1600, 
+                          y=300,
+                          active=True,
+                          inactive_color=settings.colors.GRAY)
+
+    fifteen_button = Button(text="15", 
+                          font=settings.main_font_small, 
+                          width=50, 
+                          height=50, 
+                          color=settings.colors.WHITE, 
+                          text_color=settings.colors.BLACK, 
+                          shadow_color=settings.colors.BLACK, 
+                          x=1700, 
+                          y=300,
+                          active=False,
+                          inactive_color=settings.colors.GRAY)
+
+    twenty_button = Button(text="20", 
+                          font=settings.main_font_small, 
+                          width=50, 
+                          height=50, 
+                          color=settings.colors.WHITE, 
+                          text_color=settings.colors.BLACK, 
+                          shadow_color=settings.colors.BLACK, 
+                          x=1800, 
+                          y=300,
+                          active=False,
+                          inactive_color=settings.colors.GRAY)
+
+
     game_args = {}
     while run:
         screen.fill(settings.colors.BACKGROUND)
@@ -105,11 +155,28 @@ def training_menu():
             addition_button.check_clicked(event)
             subtraction_button.check_clicked(event)
             multiplication_button.check_clicked(event)
-
+            if five_button.check_clicked(event):
+                ten_button.active = False
+                twenty_button.active = False
+                fifteen_button.active = False
+            if ten_button.check_clicked(event):
+                five_button.active = False
+                twenty_button.active = False
+                fifteen_button.active = False
+            if twenty_button.check_clicked(event):
+                five_button.active = False
+                ten_button.active = False
+                fifteen_button.active = False
+            if fifteen_button.check_clicked(event):
+                five_button.active = False
+                ten_button.active = False
+                twenty_button.active = False
             if start_button.check_clicked(event):
+                num_operations = [int(button.text) for button in [five_button, ten_button, fifteen_button, twenty_button] if button.active][0]
                 game_args['mode'] = [addition_button.active, subtraction_button.active, multiplication_button.active]
+                game_args['num_operations'] = num_operations
                 start_button.animate(screen)
-                game(game_args)
+                time_trial(game_args)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
@@ -119,6 +186,10 @@ def training_menu():
         addition_button.draw(screen)
         subtraction_button.draw(screen)
         multiplication_button.draw(screen)
+        five_button.draw(screen)
+        ten_button.draw(screen)
+        fifteen_button.draw(screen)
+        twenty_button.draw(screen)
         pygame.display.update()
 
 
@@ -162,10 +233,10 @@ def check_equation(answer, result):
     if answer != '':
         return int(answer) == result
 
-def game(game_args):
+def time_trial(game_args):
 
     input_field = TextField(font=settings.main_font_small, 
-                            width=200,
+                            width=400,
                             height=70,
                             text_color=settings.colors.BLACK,
                             active_color=settings.colors.WHITE,
@@ -176,7 +247,7 @@ def game(game_args):
 
     answer_button = Button(text="Answer", 
                              font=settings.main_font_small, 
-                             width=200, 
+                             width=400, 
                              height=50, 
                              color=settings.colors.WHITE, 
                              text_color=settings.colors.BLACK, 
@@ -186,7 +257,7 @@ def game(game_args):
                              active=True,
                              function=None)
     run = True
-    n = 10
+    n = game_args['num_operations']
 
     equations = iter(get_all_equations(game_args['mode'], n))
     current_equation = next(equations)
@@ -217,7 +288,7 @@ def game(game_args):
                         try:
                             current_equation = next(equations)
                         except StopIteration as e:
-                            results(background_color, elapsed_time)
+                            results(background_color, elapsed_time, game_args)
                     else:
                         background_color[0] = min(background_color[0] + red_step, 255)
                         background_color[1] = max(background_color[1] - red_step, 0)
@@ -235,35 +306,63 @@ def game(game_args):
         input_field.update(screen)
         answer_button.draw(screen)
 
-        functions.draw_text(f"{current_equation_index}/{num_equations}", settings.main_font_small, settings.colors.BLACK, 1500, 30, screen)
+        functions.draw_text(f"{current_equation_index}/{num_equations}", settings.main_font_small, settings.colors.BLACK, 1500, 30, screen, center=False)
         functions.draw_text(f"{current_equation[0]} {current_equation[3]} {current_equation[1]}", settings.main_font_small, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 300, screen)
         functions.draw_text(elapsed_time, settings.main_font_small, settings.colors.BLACK, 100, 30, screen, center=False)
 
         pygame.display.update()
 
-def results(background_color, elapsed_time):
+def save(game_args, name, result):
+    # save to json
+    file_name = game_args['mode']
+    with open('results.json', 'w') as f:
+        json.dump({name: result}, f)
+
+
+def results(background_color, elapsed_time, game_args):
     run = True
     
     try_again_button = Button(text="Try again", 
                              font=settings.main_font_small, 
-                             width=200, 
+                             width=400, 
                              height=50, 
                              color=settings.colors.WHITE, 
                              text_color=settings.colors.BLACK, 
                              shadow_color=settings.colors.BLACK, 
                              x=settings.SCREEN_WIDTH/2, 
-                             y=250,
-                             active=True)
+                             y=500,
+                             active=True,
+                             inactive_color=settings.colors.WHITE) 
+
+
+    save_button = Button(text="Save result", 
+                             font=settings.main_font_small, 
+                             width=400, 
+                             height=50, 
+                             color=settings.colors.WHITE, 
+                             text_color=settings.colors.BLACK, 
+                             shadow_color=settings.colors.BLACK, 
+                             x=settings.SCREEN_WIDTH/2, 
+                             y=400,
+                             active=True,
+                             inactive_color=settings.colors.WHITE)
+        
+
     while run:
         screen.fill(background_color)
         functions.draw_text(elapsed_time, settings.main_font, settings.colors.BLACK, settings.SCREEN_WIDTH/2, 70, screen) 
         for event in pygame.event.get():
+            if save_button.check_clicked(event):
+                pass
+            if try_again_button.check_clicked(event):
+                pass
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
             if event.type == pygame.QUIT:
                 run = False
         try_again_button.draw(screen)
+        save_button.draw(screen)
         pygame.display.update()
         
     pygame.quit()
