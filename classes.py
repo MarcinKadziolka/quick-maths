@@ -98,12 +98,19 @@ class TextField:
     def get_event(self, event):
         if self.active:
             if event.type == pygame.KEYDOWN:
-                if event.unicode.isdigit():
+                if event.key == pygame.K_RETURN:
+                    pass
+                elif event.key == pygame.K_BACKSPACE:
+                    pass
+                elif event.key == pygame.K_ESCAPE:
+                    pass
+                else:
                     self.user_input += event.unicode
-                elif event.key == pygame.K_MINUS:
-                    self.user_input += event.unicode
+                print(event.key)
                 if event.key == pygame.K_BACKSPACE:
+                    print("WATh")
                     self.user_input = self.user_input[:-1]
+                    print(self.user_input)
                     self.backspace_timer = pygame.time.get_ticks()
 
     def update(self, screen):

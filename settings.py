@@ -1,4 +1,5 @@
 import pygame
+
 pygame.init()
 
 SCREEN_WIDTH = 1920
@@ -8,8 +9,11 @@ MIDDLE_HEIGHT = SCREEN_HEIGHT / 2
 
 SLEEP_DURATION = 0.1
 
-main_font = pygame.font.Font("fonts/FFF_Tusj.ttf", 60)
-main_font_small = pygame.font.Font("fonts/FFF_Tusj.ttf", 40)
+# main_font = pygame.font.Font("fonts/FFF_Tusj.ttf", 60)
+# main_font_small = pygame.font.Font("fonts/FFF_Tusj.ttf", 40)
+main_font = pygame.font.SysFont("rasa", 80)
+main_font_small = pygame.font.SysFont("rasa", 50)
+equation_font_small = pygame.font.SysFont("rasa", 70)
 # COLORS
 class COLORS:
     WHITE = (255, 255, 255)
