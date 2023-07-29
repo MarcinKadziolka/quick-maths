@@ -300,18 +300,9 @@ def training_menu():
 
 
 def get_equation(operator, digits):
-    if digits == 1:
-        x = random.randint(1, 9)
-        y = random.randint(1, 9)
-    elif digits == 2:
-        x = random.randint(10, 99)
-        y = random.randint(10, 99)
-    elif digits == 3:
-        x = random.randint(100, 999)
-        y = random.randint(100, 999)
-    elif digits == 4:
-        x = random.randint(1000, 9999)
-        y = random.randint(1000, 9999)
+    random_digits = ''.join([str(random.randint(1, 9)) for _ in range(2*digits)])
+    x = int(random_digits[:digits])
+    y = int(random_digits[digits:])
 
     if operator == '+':
         result = x + y
@@ -325,7 +316,6 @@ def get_all_equations(mode, n, digits):
     addition, subtraction, multiplication = mode[0], mode[1], mode[2]
     count = sum([1 for i in mode if i == True])
     n_for_operation = n // count
-    print(n_for_operation)
     all_equations = []
 
     if addition:
@@ -343,7 +333,6 @@ def get_all_equations(mode, n, digits):
         all_equations.append(get_equation(operator, digits))
 
     random.shuffle(all_equations)
-    print(len(all_equations))
     return all_equations
 
 def check_equation(answer, result):
@@ -382,7 +371,6 @@ def time_trial(game_args):
 
     equations = iter(get_all_equations(game_args['mode'], n, game_args['num_digits']))
     current_equation = next(equations)
-    last_answer_time = 0
     background_color = list(settings.colors.BACKGROUND)
     red_step = int((background_color[0])/n) 
     green_step = int((255 - background_color[1])/n) 
@@ -399,25 +387,24 @@ def time_trial(game_args):
             
             input_field.get_event(event)
             
-            # Because it sometimes triggers to fast, we wait some miliseconds
-            if pygame.time.get_ticks() - last_answer_time > 100:
-                if answer_button.check_clicked(event):
-                    if check_equation(input_field.user_input, current_equation[2]):
-                        background_color[0] = max(background_color[0] - green_step, 0)
-                        background_color[1] = min(background_color[1] + green_step, 255)
-                        background_color[2] = max(background_color[2] - green_step, 0)
-                        current_equation_index += 1
-                        try:
-                            current_equation = next(equations)
-                        except StopIteration as e:
-                            run = results(background_color, elapsed_time, game_args)
-                    else:
-                        background_color[0] = min(background_color[0] + red_step, 255)
-                        background_color[1] = max(background_color[1] - red_step, 0)
-                        background_color[2] = max(background_color[2] - red_step, 0)
+            if answer_button.check_clicked(event):
+                if input_field.user_input == '':
+                    pass
+                elif check_equation(input_field.user_input, current_equation[2]):
+                    background_color[0] = max(background_color[0] - green_step, 0)
+                    background_color[1] = min(background_color[1] + green_step, 255)
+                    background_color[2] = max(background_color[2] - green_step, 0)
+                    current_equation_index += 1
+                    try:
+                        current_equation = next(equations)
+                    except StopIteration as e:
+                        run = results(background_color, elapsed_time, game_args)
+                else:
+                    background_color[0] = min(background_color[0] + red_step, 255)
+                    background_color[1] = max(background_color[1] - red_step, 0)
+                    background_color[2] = max(background_color[2] - red_step, 0)
 
-                    input_field.user_input = ''
-                    last_answer_time = pygame.time.get_ticks()
+                input_field.user_input = ''
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
