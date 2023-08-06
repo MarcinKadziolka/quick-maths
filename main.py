@@ -72,7 +72,7 @@ def training_menu():
         width=400,
         height=50,
         x=settings.SCREEN_WIDTH / 2,
-        y=700,
+        y=600,
         active=True,
     )
 
@@ -82,11 +82,11 @@ def training_menu():
         height=50,
         width=400,
         start_x=settings.SCREEN_WIDTH / 2,
-        start_y=300,
+        start_y=200,
         distance=100,
     )
 
-    checkboxes_x = 1450
+    checkboxes_x = 950
     digits_layout = CheckBoxLayout(
         texts=["1", "2", "3", "4"],
         active=1,
@@ -135,14 +135,14 @@ def training_menu():
 
         functions.draw_text(
             text="Number of operations",
-            x=1600,
+            x=1100,
             y=200,
             screen=screen,
         )
 
         functions.draw_text(
             text="Number of digits",
-            x=1600,
+            x=1100,
             y=400,
             screen=screen,
         )
@@ -167,8 +167,8 @@ def training_menu():
         for i in range(show_leaderboard):
             functions.draw_text(
                 text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
-                x=300,
-                y=200 + i * 50,
+                x=200,
+                y=100 + i * 50,
                 screen=screen,
             )
 
@@ -225,7 +225,7 @@ def time_trial(game_args):
         active_color=settings.colors.WHITE,
         inactive_color=settings.colors.BLACK,
         x=settings.SCREEN_WIDTH / 2,
-        y=500,
+        y=settings.SCREEN_HEIGHT-300,
         prompt_text="",
     )
 
@@ -234,7 +234,7 @@ def time_trial(game_args):
         width=400,
         height=50,
         x=settings.SCREEN_WIDTH / 2,
-        y=700,
+        y=settings.SCREEN_HEIGHT-200,
         active=True,
     )
     run = True
@@ -293,7 +293,7 @@ def time_trial(game_args):
 
         functions.draw_text(
             text=f"{current_equation_index}/{num_equations}",
-            x=1500,
+            x=settings.SCREEN_WIDTH-100,
             y=30,
             screen=screen,
             center=False,
@@ -302,7 +302,7 @@ def time_trial(game_args):
             text=f"{current_equation[0]} {current_equation[3]} {current_equation[1]}",
             font=settings.equation_font_small,
             x=settings.SCREEN_WIDTH / 2,
-            y=300,
+            y=settings.SCREEN_HEIGHT-500,
             screen=screen,
         )
         functions.draw_text(
@@ -367,8 +367,8 @@ def results(background_color, elapsed_time, game_args):
         text_color=settings.colors.BLACK,
         active_color=settings.colors.WHITE,
         inactive_color=settings.colors.BLACK,
-        x=settings.SCREEN_WIDTH / 2,
-        y=730,
+        x=settings.SCREEN_WIDTH / 2+200,
+        y=settings.SCREEN_HEIGHT-300,
         prompt_text="",
     )
 
@@ -376,8 +376,8 @@ def results(background_color, elapsed_time, game_args):
         text="Try again",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2,
-        y=930,
+        x=settings.SCREEN_WIDTH / 2+200,
+        y=settings.SCREEN_HEIGHT-100,
         active=False,
     )
 
@@ -385,8 +385,8 @@ def results(background_color, elapsed_time, game_args):
         text="Save result",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2,
-        y=830,
+        x=settings.SCREEN_WIDTH / 2+200,
+        y=settings.SCREEN_HEIGHT-200,
         active=False,
     )
     show_leaderboard = min(10, len(leaderboard))
@@ -420,8 +420,8 @@ def results(background_color, elapsed_time, game_args):
         for i in range(show_leaderboard):
             functions.draw_text(
                 text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
-                x=settings.SCREEN_WIDTH / 2,
-                y=200 + i * 50,
+                x=settings.SCREEN_WIDTH / 2-400,
+                y=100 + i * 50,
                 screen=screen,
             )
 
@@ -439,8 +439,8 @@ def countdown_settings():
         active=2,
         height=80,
         width=80,
-        start_x=settings.SCREEN_WIDTH / 2 - 200,
-        start_y=settings.SCREEN_HEIGHT / 2 - 200,
+        start_x=settings.SCREEN_WIDTH / 2-200,
+        start_y=settings.SCREEN_HEIGHT / 2,
         distance=100,
         mode="horizontal",
     )
@@ -450,7 +450,7 @@ def countdown_settings():
         width=400,
         height=50,
         x=settings.SCREEN_WIDTH / 2,
-        y=settings.SCREEN_HEIGHT / 2,
+        y=settings.SCREEN_HEIGHT / 2+200,
         active=True,
     )
 
@@ -503,7 +503,7 @@ def countdown(n_big):
         height=80,
         width=80,
         start_x=settings.SCREEN_WIDTH / 2 - 250,
-        start_y=settings.SCREEN_HEIGHT / 2 - 300,
+        start_y=settings.SCREEN_HEIGHT / 2+50,
         distance=100,
         mode="horizontal",
         inactive_color=settings.colors.WHITE
@@ -514,7 +514,7 @@ def countdown(n_big):
         width=400,
         height=50,
         x=settings.SCREEN_WIDTH / 2,
-        y=850,
+        y=settings.SCREEN_HEIGHT/2+200,
         active=True,
     )
 
@@ -536,7 +536,7 @@ def countdown(n_big):
             text=target,
             font=settings.main_font,
             x=settings.SCREEN_WIDTH / 2,
-            y=450,
+            y=settings.SCREEN_HEIGHT/2-100,
             screen=screen,
         )
 
