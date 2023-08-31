@@ -105,21 +105,26 @@ class CheckBoxLayout:
         active,
         height,
         width,
-        middle_x,
-        middle_y,
+        x,
+        y,
         distance,
+        center=True,
         mode="vertical",
         inactive_color=settings.colors.GRAY,
     ) -> None:
         self.num_buttons = len(texts)
         self.buttons = []
         self.active_id = active
-        if mode == "horizontal":
-            self.start_x = middle_x - (3 * distance) / 2
-            self.start_y = middle_y
-        elif mode == "vertical":
-            self.start_x = middle_x
-            self.start_y = middle_y - (3 * distance) / 2
+        if center:
+            if mode == "horizontal":
+                self.start_x = x - ((self.num_buttons - 1) * distance) / 2
+                self.start_y = y
+            elif mode == "vertical":
+                self.start_x = x
+                self.start_y = y - ((self.num_buttons - 1) * distance) / 2
+        else:
+            self.start_x = x
+            self.start_y = y
 
         for i, text in enumerate(texts):
             self.buttons.append(
