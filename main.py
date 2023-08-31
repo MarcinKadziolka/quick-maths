@@ -32,7 +32,7 @@ def main_menu():
         width=400,
         height=50,
         x=settings.MID_WIDTH,
-        y=first_button_y+settings.DISTANCE,
+        y=first_button_y + settings.DISTANCE,
         active=True,
     )
 
@@ -84,7 +84,7 @@ def time_trial_menu():
         x=settings.MID_WIDTH,
         y=200,
         center=False,
-        distance=settings.DISTANCE
+        distance=settings.DISTANCE,
     )
 
     checkboxes_x = settings.SCREEN_THIRDS[2]
@@ -105,7 +105,7 @@ def time_trial_menu():
         height=50,
         width=50,
         x=checkboxes_x,
-        y=checkboxes_y+settings.DISTANCE*2,
+        y=checkboxes_y + settings.DISTANCE * 2,
         distance=settings.DISTANCE,
         mode="horizontal",
     )
@@ -126,7 +126,7 @@ def time_trial_menu():
             font=settings.main_font_small,
             x=settings.SCREEN_THIRDS[0],
             y=80,
-            screen=screen
+            screen=screen,
         )
 
         for event in pygame.event.get():
@@ -217,19 +217,20 @@ def get_all_equations(mode, n, digits):
 
 
 def check_equation(answer, result):
-    if answer != "":
-        try:
-            integer_answer = int(answer)
-        except ValueError as _:
-            return False
-        return integer_answer == result
+    if answer == "":
+        return
+    try:
+        integer_answer = int(answer)
+    except ValueError as _:
+        return False
+    return integer_answer == result
 
 
 def time_trial(game_args):
     input_field = TextField(
         font=settings.equation_font_small,
         width=400,
-        height=70,
+        height=60,
         text_color=settings.colors.BLACK,
         active_color=settings.colors.WHITE,
         inactive_color=settings.colors.BLACK,
@@ -369,33 +370,32 @@ def results(background_color, elapsed_time, game_args):
 
     leaderboard = read_results(game_args)
 
+    first_button_y = settings.SCREEN_HEIGHT - 300
     input_field = TextField(
         font=settings.main_font_small,
-        width=700,
-        height=70,
+        width=400,
+        height=50,
         text_color=settings.colors.BLACK,
         active_color=settings.colors.WHITE,
         inactive_color=settings.colors.BLACK,
-        x=settings.MID_WIDTH + 200,
-        y=settings.SCREEN_HEIGHT - 300,
+        x=settings.MID_WIDTH,
+        y=first_button_y,
         prompt_text="",
     )
-
-    try_again_button = Button(
-        text="Try again",
-        width=400,
-        height=50,
-        x=settings.MID_WIDTH + 200,
-        y=settings.SCREEN_HEIGHT - 100,
-        active=False,
-    )
-
     save_button = Button(
         text="Save result",
         width=400,
         height=50,
-        x=settings.MID_WIDTH + 200,
-        y=settings.SCREEN_HEIGHT - 200,
+        x=settings.MID_WIDTH,
+        y=first_button_y + settings.DISTANCE,
+        active=False,
+    )
+    try_again_button = Button(
+        text="Try again",
+        width=400,
+        height=50,
+        x=settings.MID_WIDTH,
+        y=first_button_y + settings.DISTANCE * 2,
         active=False,
     )
     show_leaderboard = min(10, len(leaderboard))
@@ -426,11 +426,19 @@ def results(background_color, elapsed_time, game_args):
                 run = False
         input_field.update(screen)
 
+        functions.draw_text(
+            text="Leaderboard",
+            font=settings.main_font_small,
+            x=settings.SCREEN_THIRDS[0],
+            y=80,
+            screen=screen,
+        )
+
         for i in range(show_leaderboard):
             functions.draw_text(
                 text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
-                x=settings.MID_WIDTH - 400,
-                y=100 + i * 50,
+                x=settings.SCREEN_THIRDS[0],
+                y=150 + i * 50,
                 screen=screen,
             )
 
