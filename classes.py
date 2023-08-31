@@ -13,6 +13,7 @@ class Button:
         height,
         x,
         y,
+        center=True,
         font=settings.main_font_small,
         text_color=settings.colors.BLACK,
         color=settings.colors.WHITE,
@@ -105,8 +106,8 @@ class CheckBoxLayout:
         active,
         height,
         width,
-        start_x,
-        start_y,
+        middle_x,
+        middle_y,
         distance,
         mode="vertical",
         inactive_color=settings.colors.GRAY,
@@ -114,6 +115,12 @@ class CheckBoxLayout:
         self.num_buttons = len(texts)
         self.buttons = []
         self.active_id = active
+        if mode == "horizontal":
+            self.start_x = middle_x - (3 * distance + width) / 2
+            self.start_y = middle_y - height / 2
+        elif mode == "vertical":
+            self.start_x = middle_x - width / 2
+            self.start_y = middle_y - (3 * distance + height) / 2
 
         for i, text in enumerate(texts):
             self.buttons.append(
@@ -121,16 +128,16 @@ class CheckBoxLayout:
                     text=str(text),
                     width=width,
                     height=height,
-                    x=start_x,
-                    y=start_y,
+                    x=self.start_x,
+                    y=self.start_y,
                     active=(i == active),
-                    inactive_color=inactive_color
+                    inactive_color=inactive_color,
                 )
             )
             if mode == "vertical":
-                start_y += distance
+                self.start_y += distance
             else:
-                start_x += distance
+                self.start_x += distance
 
     def display(self, screen):
         for button in self.buttons:
