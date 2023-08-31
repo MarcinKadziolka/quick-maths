@@ -19,10 +19,10 @@ def main_menu():
     run = True
 
     training_button = Button(
-        text="Training",
+        text="Time trial",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2,
+        x=settings.MID_WIDTH,
         y=250,
         active=True,
     )
@@ -31,7 +31,7 @@ def main_menu():
         text="Countdown",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2,
+        x=settings.MID_WIDTH,
         y=350,
         active=True,
     )
@@ -41,14 +41,14 @@ def main_menu():
         functions.draw_text(
             text="QuickMaths",
             font=settings.main_font,
-            x=settings.SCREEN_WIDTH / 2,
+            x=settings.MID_WIDTH,
             y=70,
             screen=screen,
         )
         for event in pygame.event.get():
             if training_button.check_clicked(event):
                 training_button.animate(screen)
-                training_menu()
+                time_trial_menu()
             if countdown_button.check_clicked(event):
                 countdown_button.animate(screen)
                 countdown_settings()
@@ -64,14 +64,14 @@ def main_menu():
     pygame.quit()
 
 
-def training_menu():
+def time_trial_menu():
     run = True
 
     start_button = Button(
         text="Start",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2,
+        x=settings.MID_WIDTH,
         y=600,
         active=True,
     )
@@ -81,20 +81,22 @@ def training_menu():
         active=0,
         height=50,
         width=400,
-        start_x=settings.SCREEN_WIDTH / 2,
-        start_y=200,
+        middle_x=settings.MID_WIDTH,
+        middle_y=settings.MID_HEIGHT,
         distance=100,
     )
 
-    checkboxes_x = 950
+    checkboxes_x = settings.SCREEN_THIRDS[2]
+    checkboxes_y = 300
+    checkboxes_distance = 80
     digits_layout = CheckBoxLayout(
         texts=["1", "2", "3", "4"],
         active=1,
         height=50,
         width=50,
-        start_x=checkboxes_x,
-        start_y=500,
-        distance=100,
+        middle_x=checkboxes_x,
+        middle_y=checkboxes_y+200,
+        distance=checkboxes_distance,
         mode="horizontal",
     )
     rounds_layout = CheckBoxLayout(
@@ -102,9 +104,9 @@ def training_menu():
         active=1,
         height=50,
         width=50,
-        start_x=checkboxes_x,
-        start_y=300,
-        distance=100,
+        middle_x=checkboxes_x,
+        middle_y=checkboxes_y,
+        distance=checkboxes_distance,
         mode="horizontal",
     )
 
@@ -112,11 +114,19 @@ def training_menu():
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text(
-            text="Training",
+            text="Time trial",
             font=settings.main_font,
-            x=settings.SCREEN_WIDTH / 2,
+            x=settings.MID_WIDTH,
             y=70,
             screen=screen,
+        )
+
+        functions.draw_text(
+            text="Leaderboard",
+            font=settings.main_font_small,
+            x=settings.SCREEN_THIRDS[0],
+            y=80,
+            screen=screen
         )
 
         for event in pygame.event.get():
@@ -134,15 +144,15 @@ def training_menu():
                 run = False
 
         functions.draw_text(
-            text="Number of operations",
-            x=1100,
+            text="Operations",
+            x=settings.SCREEN_WIDTH-200,
             y=200,
             screen=screen,
         )
 
         functions.draw_text(
-            text="Number of digits",
-            x=1100,
+            text="Digits",
+            x=settings.SCREEN_WIDTH-200,
             y=400,
             screen=screen,
         )
@@ -167,8 +177,8 @@ def training_menu():
         for i in range(show_leaderboard):
             functions.draw_text(
                 text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
-                x=200,
-                y=100 + i * 50,
+                x=settings.SCREEN_THIRDS[0],
+                y=150 + i * 50,
                 screen=screen,
             )
 
@@ -211,7 +221,7 @@ def check_equation(answer, result):
     if answer != "":
         try:
             integer_answer = int(answer)
-        except ValueError as e:
+        except ValueError as _:
             return False
         return integer_answer == result
 
@@ -224,8 +234,8 @@ def time_trial(game_args):
         text_color=settings.colors.BLACK,
         active_color=settings.colors.WHITE,
         inactive_color=settings.colors.BLACK,
-        x=settings.SCREEN_WIDTH / 2,
-        y=settings.SCREEN_HEIGHT-300,
+        x=settings.MID_WIDTH,
+        y=settings.SCREEN_HEIGHT - 300,
         prompt_text="",
     )
 
@@ -233,8 +243,8 @@ def time_trial(game_args):
         text="Answer",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2,
-        y=settings.SCREEN_HEIGHT-200,
+        x=settings.MID_WIDTH,
+        y=settings.SCREEN_HEIGHT - 200,
         active=True,
     )
     run = True
@@ -256,7 +266,7 @@ def time_trial(game_args):
         functions.draw_text(
             text="Game",
             font=settings.main_font,
-            x=settings.SCREEN_WIDTH / 2,
+            x=settings.MID_WIDTH,
             y=70,
             screen=screen,
         )
@@ -273,7 +283,7 @@ def time_trial(game_args):
                     current_equation_index += 1
                     try:
                         current_equation = next(equations)
-                    except StopIteration as e:
+                    except StopIteration as _:
                         run = results(background_color, elapsed_time, game_args)
                 else:
                     background_color[0] = min(background_color[0] + red_step, 255)
@@ -293,7 +303,7 @@ def time_trial(game_args):
 
         functions.draw_text(
             text=f"{current_equation_index}/{num_equations}",
-            x=settings.SCREEN_WIDTH-100,
+            x=settings.SCREEN_WIDTH - 100,
             y=30,
             screen=screen,
             center=False,
@@ -301,8 +311,8 @@ def time_trial(game_args):
         functions.draw_text(
             text=f"{current_equation[0]} {current_equation[3]} {current_equation[1]}",
             font=settings.equation_font_small,
-            x=settings.SCREEN_WIDTH / 2,
-            y=settings.SCREEN_HEIGHT-500,
+            x=settings.MID_WIDTH,
+            y=settings.SCREEN_HEIGHT - 500,
             screen=screen,
         )
         functions.draw_text(
@@ -335,7 +345,7 @@ def save(game_args, name, result):
     leaderboard = read_results(game_args)
     # check if entry already exists
     # if it does return
-    for i, entry in enumerate(leaderboard):
+    for _, entry in enumerate(leaderboard):
         if entry[0] == name and entry[1] == result:
             return
 
@@ -367,8 +377,8 @@ def results(background_color, elapsed_time, game_args):
         text_color=settings.colors.BLACK,
         active_color=settings.colors.WHITE,
         inactive_color=settings.colors.BLACK,
-        x=settings.SCREEN_WIDTH / 2+200,
-        y=settings.SCREEN_HEIGHT-300,
+        x=settings.MID_WIDTH + 200,
+        y=settings.SCREEN_HEIGHT - 300,
         prompt_text="",
     )
 
@@ -376,8 +386,8 @@ def results(background_color, elapsed_time, game_args):
         text="Try again",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2+200,
-        y=settings.SCREEN_HEIGHT-100,
+        x=settings.MID_WIDTH + 200,
+        y=settings.SCREEN_HEIGHT - 100,
         active=False,
     )
 
@@ -385,8 +395,8 @@ def results(background_color, elapsed_time, game_args):
         text="Save result",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2+200,
-        y=settings.SCREEN_HEIGHT-200,
+        x=settings.MID_WIDTH + 200,
+        y=settings.SCREEN_HEIGHT - 200,
         active=False,
     )
     show_leaderboard = min(10, len(leaderboard))
@@ -395,7 +405,7 @@ def results(background_color, elapsed_time, game_args):
         functions.draw_text(
             text=elapsed_time,
             font=settings.main_font,
-            x=settings.SCREEN_WIDTH / 2,
+            x=settings.MID_WIDTH,
             y=70,
             screen=screen,
         )
@@ -420,7 +430,7 @@ def results(background_color, elapsed_time, game_args):
         for i in range(show_leaderboard):
             functions.draw_text(
                 text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
-                x=settings.SCREEN_WIDTH / 2-400,
+                x=settings.MID_WIDTH - 400,
                 y=100 + i * 50,
                 screen=screen,
             )
@@ -439,8 +449,8 @@ def countdown_settings():
         active=2,
         height=80,
         width=80,
-        start_x=settings.SCREEN_WIDTH / 2-200,
-        start_y=settings.SCREEN_HEIGHT / 2,
+        middle_x=settings.MID_WIDTH,
+        middle_y=settings.MID_HEIGHT,
         distance=100,
         mode="horizontal",
     )
@@ -449,8 +459,8 @@ def countdown_settings():
         "Start",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2,
-        y=settings.SCREEN_HEIGHT / 2+200,
+        x=settings.MID_WIDTH,
+        y=settings.MID_HEIGHT + 200,
         active=True,
     )
 
@@ -459,14 +469,14 @@ def countdown_settings():
         functions.draw_text(
             text="Countdown",
             font=settings.main_font,
-            x=settings.SCREEN_WIDTH / 2,
+            x=settings.MID_WIDTH,
             y=70,
             screen=screen,
         )
 
         functions.draw_text(
             text="How many big numbers?",
-            x=settings.SCREEN_WIDTH / 2,
+            x=settings.MID_WIDTH,
             y=170,
             screen=screen,
         )
@@ -492,7 +502,7 @@ def countdown_settings():
 def countdown(n_big):
     run = True
     nums = random.sample([25, 50, 75, 100], n_big)
-    small_nums = random.sample(range(1, 11), counts=[2 for i in range(10)], k=6-n_big)
+    small_nums = random.sample(range(1, 11), counts=[2 for _ in range(10)], k=6 - n_big)
     nums.extend(small_nums)
     random.shuffle(nums)
     target = random.randint(101, 999)
@@ -502,23 +512,23 @@ def countdown(n_big):
         active=-1,
         height=80,
         width=80,
-        start_x=settings.SCREEN_WIDTH / 2 - 250,
-        start_y=settings.SCREEN_HEIGHT / 2+50,
+        middle_x=settings.MID_WIDTH - 250,
+        middle_y=settings.MID_HEIGHT + 50,
         distance=100,
         mode="horizontal",
-        inactive_color=settings.colors.WHITE
+        inactive_color=settings.colors.WHITE,
     )
 
     next_button = Button(
         text="Next",
         width=400,
         height=50,
-        x=settings.SCREEN_WIDTH / 2,
-        y=settings.SCREEN_HEIGHT/2+200,
+        x=settings.MID_WIDTH,
+        y=settings.MID_HEIGHT + 200,
         active=True,
     )
 
-    timer_event = pygame.USEREVENT+1
+    timer_event = pygame.USEREVENT + 1
     pygame.time.set_timer(timer_event, 1000)
     counter = 30
     background_color = settings.colors.BACKGROUND
@@ -527,7 +537,7 @@ def countdown(n_big):
         functions.draw_text(
             text="Countdown",
             font=settings.main_font,
-            x=settings.SCREEN_WIDTH / 2,
+            x=settings.MID_WIDTH,
             y=70,
             screen=screen,
         )
@@ -535,8 +545,8 @@ def countdown(n_big):
         functions.draw_text(
             text=target,
             font=settings.main_font,
-            x=settings.SCREEN_WIDTH / 2,
-            y=settings.SCREEN_HEIGHT/2-100,
+            x=settings.MID_WIDTH,
+            y=settings.MID_HEIGHT - 100,
             screen=screen,
         )
 
