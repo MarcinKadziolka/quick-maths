@@ -89,16 +89,6 @@ def time_trial_menu():
     checkboxes_x = settings.SCREEN_THIRDS[2]
     checkboxes_y = 300
     checkboxes_distance = 80
-    digits_layout = CheckBoxLayout(
-        texts=["1", "2", "3", "4"],
-        active=1,
-        height=50,
-        width=50,
-        middle_x=checkboxes_x,
-        middle_y=checkboxes_y+200,
-        distance=checkboxes_distance,
-        mode="horizontal",
-    )
     rounds_layout = CheckBoxLayout(
         texts=["5", "10", "15", "20"],
         active=1,
@@ -106,6 +96,16 @@ def time_trial_menu():
         width=50,
         middle_x=checkboxes_x,
         middle_y=checkboxes_y,
+        distance=checkboxes_distance,
+        mode="horizontal",
+    )
+    digits_layout = CheckBoxLayout(
+        texts=["1", "2", "3", "4"],
+        active=1,
+        height=50,
+        width=50,
+        middle_x=checkboxes_x,
+        middle_y=checkboxes_y+200,
         distance=checkboxes_distance,
         mode="horizontal",
     )
@@ -145,14 +145,13 @@ def time_trial_menu():
 
         functions.draw_text(
             text="Operations",
-            x=settings.SCREEN_WIDTH-200,
+            x=checkboxes_x,
             y=200,
             screen=screen,
         )
-
         functions.draw_text(
             text="Digits",
-            x=settings.SCREEN_WIDTH-200,
+            x=checkboxes_x,
             y=400,
             screen=screen,
         )
