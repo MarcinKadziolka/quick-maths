@@ -18,7 +18,6 @@ class Button:
         color=settings.colors.WHITE,
         shadow_color=settings.colors.BLACK,
         active=False,
-        function=None,
         inactive_color=settings.colors.GRAY,
     ):
         self.button = pygame.Rect(0, 0, width, height)
@@ -202,9 +201,9 @@ class TextField:
 
     def update(self, screen):
         if self.active:
-            pygame.draw.rect(screen, self.active_color, self.input_field)
+            pygame.draw.rect(screen, self.active_color, self.input_field, border_radius=50)
         else:
-            pygame.draw.rect(screen, self.inactive_color, self.input_field)
+            pygame.draw.rect(screen, self.inactive_color, self.input_field, border_radius=50)
 
         functions.draw_text(
             text=self.user_input,
