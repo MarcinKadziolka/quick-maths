@@ -17,13 +17,13 @@ pygame.display.set_caption("Quick Maths")
 
 def main_menu():
     run = True
-
+    first_button_y = 250
     training_button = Button(
         text="Time trial",
         width=400,
         height=50,
         x=settings.MID_WIDTH,
-        y=250,
+        y=first_button_y,
         active=True,
     )
 
@@ -32,7 +32,7 @@ def main_menu():
         width=400,
         height=50,
         x=settings.MID_WIDTH,
-        y=350,
+        y=first_button_y+settings.DISTANCE,
         active=True,
     )
 
@@ -81,22 +81,22 @@ def time_trial_menu():
         active=0,
         height=50,
         width=400,
-        middle_x=settings.MID_WIDTH,
-        middle_y=settings.MID_HEIGHT,
-        distance=100,
+        x=settings.MID_WIDTH,
+        y=200,
+        center=False,
+        distance=settings.DISTANCE
     )
 
     checkboxes_x = settings.SCREEN_THIRDS[2]
-    checkboxes_y = 300
-    checkboxes_distance = 80
+    checkboxes_y = 200
     rounds_layout = CheckBoxLayout(
         texts=["5", "10", "15", "20"],
         active=1,
         height=50,
         width=50,
-        middle_x=checkboxes_x,
-        middle_y=checkboxes_y,
-        distance=checkboxes_distance,
+        x=checkboxes_x,
+        y=checkboxes_y,
+        distance=settings.DISTANCE,
         mode="horizontal",
     )
     digits_layout = CheckBoxLayout(
@@ -104,9 +104,9 @@ def time_trial_menu():
         active=1,
         height=50,
         width=50,
-        middle_x=checkboxes_x,
-        middle_y=checkboxes_y+200,
-        distance=checkboxes_distance,
+        x=checkboxes_x,
+        y=checkboxes_y+settings.DISTANCE*2,
+        distance=settings.DISTANCE,
         mode="horizontal",
     )
 
@@ -146,13 +146,13 @@ def time_trial_menu():
         functions.draw_text(
             text="Operations",
             x=checkboxes_x,
-            y=200,
+            y=120,
             screen=screen,
         )
         functions.draw_text(
             text="Digits",
             x=checkboxes_x,
-            y=400,
+            y=280,
             screen=screen,
         )
 
@@ -448,8 +448,8 @@ def countdown_settings():
         active=2,
         height=80,
         width=80,
-        middle_x=settings.MID_WIDTH,
-        middle_y=settings.MID_HEIGHT,
+        x=settings.MID_WIDTH,
+        y=settings.MID_HEIGHT,
         distance=100,
         mode="horizontal",
     )
@@ -511,8 +511,8 @@ def countdown(n_big):
         active=-1,
         height=80,
         width=80,
-        middle_x=settings.MID_WIDTH - 250,
-        middle_y=settings.MID_HEIGHT + 50,
+        x=settings.MID_WIDTH,
+        y=settings.MID_HEIGHT,
         distance=100,
         mode="horizontal",
         inactive_color=settings.colors.WHITE,
