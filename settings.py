@@ -18,6 +18,7 @@ class COLORS:
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
     BACKGROUND = (167, 199, 250)
+    GREEN = (127, 255, 212)
     LIGHT_GREEN = (161, 210, 250)
     LIGHT_RED = (180, 190, 250)
     GRAY = (220,220,220)
