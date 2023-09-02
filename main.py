@@ -330,7 +330,7 @@ def time_trial(game_args):
 def save(game_args, name, result):
     # save to csv
     file_name = (
-        f"{game_args['mode']}_{game_args['num_operations']}_{game_args['num_digits']}"
+        f"{game_args['mode']}_no_{game_args['num_operations']}_nd_{game_args['num_digits']}"
     )
     date = datetime.datetime.now().strftime("%Y-%m-%d")
     if not os.path.exists("results"):
