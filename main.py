@@ -170,19 +170,20 @@ def time_trial_menu():
         game_args["num_digits"] = int(
             digits_layout.buttons[digits_layout.active_id].text
         )
-        leaderboard = read_results(game_args)
-        show_leaderboard = min(10, len(leaderboard))
-
-        for i in range(show_leaderboard):
-            functions.draw_text(
-                text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
-                x=settings.SCREEN_THIRDS[0],
-                y=150 + i * 50,
-                screen=screen,
-            )
-
+        show_leaderboard(game_args=game_args, screen=screen, x=settings.SCREEN_THIRDS[0], y=150)
         pygame.display.update()
 
+def show_leaderboard(game_args, screen, x, y):
+    leaderboard = read_results(game_args)
+    show_leaderboard = min(10, len(leaderboard))
+
+    for i in range(show_leaderboard):
+        functions.draw_text(
+            text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
+            x=x,
+            y=y + i * 50,
+            screen=screen,
+        )
 
 def get_equation(operator, digits):
     if operator == "*" and digits == 1:
@@ -368,8 +369,6 @@ def read_results(game_args):
 def results(background_color, elapsed_time, game_args):
     run = True
 
-    leaderboard = read_results(game_args)
-
     first_button_y = settings.SCREEN_HEIGHT - 300
     input_field = TextField(
         font=settings.main_font_small,
@@ -398,7 +397,6 @@ def results(background_color, elapsed_time, game_args):
         y=first_button_y + settings.DISTANCE * 2,
         active=False,
     )
-    show_leaderboard = min(10, len(leaderboard))
     while run:
         screen.fill(background_color)
         functions.draw_text(
@@ -412,10 +410,6 @@ def results(background_color, elapsed_time, game_args):
             input_field.get_event(event)
             if save_button.check_clicked(event):
                 save(game_args, input_field.user_input, elapsed_time)
-                sleep(0.5)
-                # leaderboard = read_results(game_args)
-                show_leaderboard = min(10, len(leaderboard))
-                save_button.active = False
 
             if try_again_button.check_clicked(event):
                 return False
@@ -434,13 +428,7 @@ def results(background_color, elapsed_time, game_args):
             screen=screen,
         )
 
-        for i in range(show_leaderboard):
-            functions.draw_text(
-                text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
-                x=settings.SCREEN_THIRDS[0],
-                y=150 + i * 50,
-                screen=screen,
-            )
+        show_leaderboard(game_args=game_args, screen=screen, x=settings.SCREEN_THIRDS[0], y=150)
 
         try_again_button.draw(screen)
         save_button.draw(screen)
