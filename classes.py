@@ -140,12 +140,9 @@ class CheckBoxLayout:
     def update(self, event):
         for i, button in enumerate(self.buttons):
             if button.check_clicked(event):
-                for j, button in enumerate(self.buttons):
-                    if i == j:
-                        button.active = True
-                        self.active_id = i
-                    else:
-                        button.active = False
+                self.active_id = i
+                for other_button in self.buttons:
+                    other_button.active = (button == other_button)
                 break
 
 
