@@ -20,21 +20,24 @@ class Button:
         active=False,
         inactive_color=settings.colors.GRAY,
     ):
-        self.button = pygame.Rect(0, 0, width, height)
-        self.button.center = x, y
-        self.shadow = pygame.Rect(0, 0, width, height)
-        self.shadow.center = x, y + 5
-        self.color = color
-        self.shadow_color = shadow_color
-        self.clicked = False
         self.x = x
         self.y = y
+        self.button = pygame.Rect(0, 0, width, height)
+        self.shadow = pygame.Rect(0, 0, width, height)
+        self.button.center = x, y
+        self.shadow.center = x, y + 5
+
+        self.color = color
+        self.shadow_color = shadow_color
+        self.inactive_color = inactive_color
+        self.text_color = text_color
+
         self.text = text
         self.font = font
-        self.text_color = text_color
+
+        self.clicked = False
         self.active = active
         self.action = False
-        self.inactive_color = inactive_color
 
     def draw_down(self, screen):
         color = self.color if self.active else self.inactive_color
@@ -49,28 +52,13 @@ class Button:
     def check_clicked(self, event):
         action = False
         pos = pygame.mouse.get_pos()
-
-        if (
-            self.button.collidepoint(pos)
-            and pygame.mouse.get_pressed()[0]
-            and not self.clicked
-        ):
+        left_click = pygame.mouse.get_pressed()[0]
+        if self.button.collidepoint(pos) and left_click and not self.clicked:
             self.clicked = True
-            if self.active:
-                self.active = False
-            else:
-                self.active = True
 
-        if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
+        if left_click == 0 and self.clicked:
             self.clicked = False
             action = True
-
-        if self.active:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                self.clicked = True
-            if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
-                self.clicked = False
-                action = True
 
         return action
 
@@ -201,9 +189,13 @@ class TextField:
 
     def update(self, screen):
         if self.active:
-            pygame.draw.rect(screen, self.active_color, self.input_field, border_radius=50)
+            pygame.draw.rect(
+                screen, self.active_color, self.input_field, border_radius=50
+            )
         else:
-            pygame.draw.rect(screen, self.inactive_color, self.input_field, border_radius=50)
+            pygame.draw.rect(
+                screen, self.inactive_color, self.input_field, border_radius=50
+            )
 
         functions.draw_text(
             text=self.user_input,
