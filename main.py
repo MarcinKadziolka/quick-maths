@@ -6,7 +6,6 @@ import random
 import time
 import datetime
 import os
-from time import sleep
 
 pygame.init()
 
@@ -238,6 +237,7 @@ def time_trial(game_args):
         x=settings.MID_WIDTH,
         y=settings.SCREEN_HEIGHT - 300,
         prompt_text="",
+        numeric_only=True,
     )
 
     answer_button = Button(
@@ -387,7 +387,7 @@ def results(background_color, elapsed_time, game_args):
         height=50,
         x=settings.MID_WIDTH,
         y=first_button_y + settings.DISTANCE,
-        active=False,
+        active=True,
     )
     try_again_button = Button(
         text="Try again",
@@ -395,7 +395,7 @@ def results(background_color, elapsed_time, game_args):
         height=50,
         x=settings.MID_WIDTH,
         y=first_button_y + settings.DISTANCE * 2,
-        active=False,
+        active=True,
     )
     while run:
         screen.fill(background_color)
@@ -410,6 +410,7 @@ def results(background_color, elapsed_time, game_args):
             input_field.get_event(event)
             if save_button.check_clicked(event):
                 save(game_args, input_field.user_input, elapsed_time)
+                save_button.active = False
 
             if try_again_button.check_clicked(event):
                 return False
@@ -418,8 +419,8 @@ def results(background_color, elapsed_time, game_args):
                     run = False
             if event.type == pygame.QUIT:
                 run = False
-        input_field.update(screen)
 
+        input_field.update(screen)
         functions.draw_text(
             text="Leaderboard",
             font=settings.main_font_small,
