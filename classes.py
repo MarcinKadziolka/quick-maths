@@ -4,7 +4,6 @@ from time import sleep
 import settings
 
 
-# button class
 class Button:
     def __init__(
         self,
@@ -26,7 +25,7 @@ class Button:
         self.shadow = pygame.Rect(0, 0, width, height)
         self.button.center = x, y
         self.shadow.center = x, y + 5
-
+        self.border_radius = 5
         self.color = color
         self.shadow_color = shadow_color
         self.inactive_color = inactive_color
@@ -42,12 +41,16 @@ class Button:
     def draw_down(self, screen):
         color = self.color if self.active else self.inactive_color
         self.button.center = self.x, self.y + 5
-        pygame.draw.rect(screen, color, self.button, width=0, border_radius=5)
+        pygame.draw.rect(
+            screen, color, self.button, width=0, border_radius=self.border_radius
+        )
 
     def draw_up(self, screen):
         color = self.color if self.active else self.inactive_color
         self.button.center = self.x, self.y
-        pygame.draw.rect(screen, color, self.button, width=0, border_radius=5)
+        pygame.draw.rect(
+            screen, color, self.button, width=0, border_radius=self.border_radius
+        )
 
     def check_clicked(self, event):
         action = False
@@ -64,12 +67,13 @@ class Button:
 
     def draw(self, screen):
         pygame.draw.rect(
-            screen, self.shadow_color, self.shadow, width=0, border_radius=5
+            screen,
+            self.shadow_color,
+            self.shadow,
+            width=0,
+            border_radius=self.border_radius,
         )
-        if self.clicked:
-            self.draw_down(screen)
-        else:
-            self.draw_up(screen)
+        self.draw_down(screen) if self.clicked else self.draw_up(screen)
         functions.draw_text(
             text=self.text,
             text_color=self.text_color,
@@ -102,16 +106,14 @@ class CheckBoxLayout:
         self.num_buttons = len(texts)
         self.buttons = []
         self.active_id = active
+        self.start_x = x
+        self.start_y = y
+
         if center:
             if mode == "horizontal":
                 self.start_x = x - ((self.num_buttons - 1) * distance) / 2
-                self.start_y = y
             elif mode == "vertical":
-                self.start_x = x
                 self.start_y = y - ((self.num_buttons - 1) * distance) / 2
-        else:
-            self.start_x = x
-            self.start_y = y
 
         for i, text in enumerate(texts):
             self.buttons.append(
@@ -125,10 +127,10 @@ class CheckBoxLayout:
                     inactive_color=inactive_color,
                 )
             )
-            if mode == "vertical":
-                self.start_y += distance
-            else:
+            if mode == "horizontal":
                 self.start_x += distance
+            else:
+                self.start_y += distance
 
     def display(self, screen):
         for button in self.buttons:
