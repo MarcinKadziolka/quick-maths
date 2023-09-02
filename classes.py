@@ -18,14 +18,20 @@ class Button:
         shadow_color=settings.colors.BLACK,
         active=False,
         inactive_color=settings.colors.GRAY,
+        on_hover=True,
     ):
         self.x = x
         self.y = y
+        self.width = width
+        self.height = height
         self.button = pygame.Rect(0, 0, width, height)
         self.shadow = pygame.Rect(0, 0, width, height)
+        self.hitbox = pygame.Rect(0, 0, width, height)
+        self.hitbox.center = x, y
         self.button.center = x, y
         self.shadow.center = x, y + 5
         self.border_radius = 5
+
         self.color = color
         self.shadow_color = shadow_color
         self.inactive_color = inactive_color
@@ -38,16 +44,48 @@ class Button:
         self.active = active
         self.action = False
 
+        if on_hover:
+            self.hover_size = 2
+            self.hover_pop = 2
+        else:
+            self.hover_size = 0
+            self.hover_pop = 0
+
     def draw_down(self, screen):
         color = self.color if self.active else self.inactive_color
-        self.button.center = self.x, self.y + 5
+
+        self.button.center = self.x, self.y + 5 - self.hover_pop
         pygame.draw.rect(
             screen, color, self.button, width=0, border_radius=self.border_radius
         )
 
     def draw_up(self, screen):
+        pos = pygame.mouse.get_pos()
         color = self.color if self.active else self.inactive_color
-        self.button.center = self.x, self.y
+
+        if self.hitbox.collidepoint(pos):
+            self.button = pygame.Rect(
+                0, 0, self.width + self.hover_size, self.height + self.hover_size
+            )
+            self.shadow = pygame.Rect(
+                0, 0, self.width + self.hover_size, self.height + self.hover_size
+            )
+            self.button.center = self.x, self.y - self.hover_pop
+            self.shadow.center = self.x, self.y + 5# - self.hover_pop
+
+        else:
+            self.button = pygame.Rect(0, 0, self.width, self.height)
+            self.shadow = pygame.Rect(0, 0, self.width, self.height)
+            self.button.center = self.x, self.y
+            self.shadow.center = self.x, self.y + 5
+
+        pygame.draw.rect(
+            screen,
+            self.shadow_color,
+            self.shadow,
+            width=0,
+            border_radius=self.border_radius,
+        )
         pygame.draw.rect(
             screen, color, self.button, width=0, border_radius=self.border_radius
         )
@@ -66,13 +104,6 @@ class Button:
         return action
 
     def draw(self, screen):
-        pygame.draw.rect(
-            screen,
-            self.shadow_color,
-            self.shadow,
-            width=0,
-            border_radius=self.border_radius,
-        )
         self.draw_down(screen) if self.clicked else self.draw_up(screen)
         functions.draw_text(
             text=self.text,
@@ -87,6 +118,11 @@ class Button:
         self.draw(screen)
         pygame.display.update()
         sleep(settings.SLEEP_DURATION)
+
+
+class ButtonLayout:
+    def __init__(self, buttons):
+        pass
 
 
 class CheckBoxLayout:
@@ -142,7 +178,7 @@ class CheckBoxLayout:
             if button.check_clicked(event):
                 self.active_id = i
                 for other_button in self.buttons:
-                    other_button.active = (button == other_button)
+                    other_button.active = button == other_button
                 break
 
 
@@ -193,9 +229,7 @@ class TextField:
 
     def update(self, screen):
         color = self.active_color if self.active else self.inactive_color
-        pygame.draw.rect(
-            screen, color, self.input_field, border_radius=50
-        )
+        pygame.draw.rect(screen, color, self.input_field, border_radius=50)
 
         functions.draw_text(
             text=self.user_input,
