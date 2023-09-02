@@ -161,6 +161,7 @@ class TextField:
         x,
         y,
         prompt_text,
+        numeric_only=False,
     ):
         self.active = True
         self.user_input = prompt_text
@@ -175,30 +176,29 @@ class TextField:
         self.delete_speed = 50
         self.delete_wait = self.fast_delete_activation
 
+        self.dont_register = [pygame.K_RETURN, pygame.K_BACKSPACE, pygame.K_ESCAPE]
+        self.numeric_only = numeric_only
+
     def get_event(self, event):
-        if self.active:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    pass
-                elif event.key == pygame.K_BACKSPACE:
-                    pass
-                elif event.key == pygame.K_ESCAPE:
-                    pass
-                else:
-                    self.user_input += event.unicode
-                if event.key == pygame.K_BACKSPACE:
-                    self.user_input = self.user_input[:-1]
-                    self.backspace_timer = pygame.time.get_ticks()
+        if not self.active or event.type != pygame.KEYDOWN:
+            return
+        if event.key == pygame.K_BACKSPACE:
+            self.user_input = self.user_input[:-1]
+            self.backspace_timer = pygame.time.get_ticks()
+
+        if event.key in self.dont_register:
+            return
+
+        if self.numeric_only and event.unicode.isnumeric():
+            self.user_input += event.unicode
+        else:
+            self.user_input += event.unicode
 
     def update(self, screen):
-        if self.active:
-            pygame.draw.rect(
-                screen, self.active_color, self.input_field, border_radius=50
-            )
-        else:
-            pygame.draw.rect(
-                screen, self.inactive_color, self.input_field, border_radius=50
-            )
+        color = self.active_color if self.active else self.inactive_color
+        pygame.draw.rect(
+            screen, color, self.input_field, border_radius=50
+        )
 
         functions.draw_text(
             text=self.user_input,
