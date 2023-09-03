@@ -1,7 +1,7 @@
 import pygame
 import settings
 import functions
-from classes import Button, TextField, CheckBoxLayout
+from classes import Button, TextField, CheckBoxLayout, Layout, ButtonLayout
 import random
 import time
 import datetime
@@ -34,7 +34,8 @@ def main_menu():
         y=first_button_y + settings.DISTANCE,
         active=True,
     )
-
+    button_layout = ButtonLayout([training_button, countdown_button])
+    layout = Layout([button_layout])
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text(
@@ -108,7 +109,6 @@ def time_trial_menu():
         distance=settings.DISTANCE,
         mode="horizontal",
     )
-
     game_args = {}
     while run:
         screen.fill(settings.colors.BACKGROUND)
