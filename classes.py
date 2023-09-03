@@ -36,13 +36,13 @@ class Button:
         self.shadow_color = shadow_color
         self.inactive_color = inactive_color
         self.text_color = text_color
-
+        self.current_color = settings.COLORS.GREEN
         self.text = text
         self.font = font
 
         self.clicked = False
         self.active = active
-        self.action = False
+        self.current = False
 
         if on_hover:
             self.hover_size = 2
@@ -51,17 +51,27 @@ class Button:
             self.hover_size = 0
             self.hover_pop = 0
 
-    def draw_down(self, screen):
-        color = self.color if self.active else self.inactive_color
+    def set_color(self):
+        self.color_to_display = (
+            self.current_color
+            if self.current
+            else self.color
+            if self.active
+            else self.inactive_color
+        )
 
+    def draw_down(self, screen):
         self.button.center = self.x, self.y + 5 - self.hover_pop
         pygame.draw.rect(
-            screen, color, self.button, width=0, border_radius=self.border_radius
+            screen,
+            self.color_to_display,
+            self.button,
+            width=0,
+            border_radius=self.border_radius,
         )
 
     def draw_up(self, screen):
         pos = pygame.mouse.get_pos()
-        color = self.color if self.active else self.inactive_color
 
         if self.hitbox.collidepoint(pos):
             self.button = pygame.Rect(
@@ -71,7 +81,7 @@ class Button:
                 0, 0, self.width + self.hover_size, self.height + self.hover_size
             )
             self.button.center = self.x, self.y - self.hover_pop
-            self.shadow.center = self.x, self.y + 5# - self.hover_pop
+            self.shadow.center = self.x, self.y + 5  # - self.hover_pop
 
         else:
             self.button = pygame.Rect(0, 0, self.width, self.height)
@@ -87,7 +97,11 @@ class Button:
             border_radius=self.border_radius,
         )
         pygame.draw.rect(
-            screen, color, self.button, width=0, border_radius=self.border_radius
+            screen,
+            self.color_to_display,
+            self.button,
+            width=0,
+            border_radius=self.border_radius,
         )
 
     def check_clicked(self, event):
@@ -104,6 +118,7 @@ class Button:
         return action
 
     def draw(self, screen):
+        self.set_color()
         self.draw_down(screen) if self.clicked else self.draw_up(screen)
         functions.draw_text(
             text=self.text,
@@ -120,9 +135,18 @@ class Button:
         sleep(settings.SLEEP_DURATION)
 
 
-class ButtonLayout:
-    def __init__(self, buttons):
+class Layout:
+    def __init__(self, layouts):
+        self.curr_layout_id = 0
+        self.curr_inside_id = 0
+        self.layouts = layouts
+        self.layouts[0].buttons[0].current = True
         pass
+
+
+class ButtonLayout:
+    def __init__(self, buttons) -> None:
+        self.buttons = buttons
 
 
 class CheckBoxLayout:
