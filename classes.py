@@ -1,3 +1,4 @@
+from typing import List
 import pygame
 import functions
 from time import sleep
@@ -19,6 +20,7 @@ class Button:
         active=False,
         inactive_color=settings.colors.GRAY,
         on_hover=True,
+        function=None,
     ):
         self.x = x
         self.y = y
@@ -43,6 +45,8 @@ class Button:
         self.clicked = False
         self.active = active
         self.current = False
+
+        self.function = function
 
         if on_hover:
             self.hover_size = 2
@@ -81,7 +85,7 @@ class Button:
                 0, 0, self.width + self.hover_size, self.height + self.hover_size
             )
             self.button.center = self.x, self.y - self.hover_pop
-            self.shadow.center = self.x, self.y + 5  # - self.hover_pop
+            self.shadow.center = self.x, self.y + 5
 
         else:
             self.button = pygame.Rect(0, 0, self.width, self.height)
@@ -117,6 +121,10 @@ class Button:
 
         return action
 
+    def run(self):
+        self.function()
+
+
     def draw(self, screen):
         self.set_color()
         self.draw_down(screen) if self.clicked else self.draw_up(screen)
@@ -135,19 +143,28 @@ class Button:
         sleep(settings.SLEEP_DURATION)
 
 
+class ButtonLayout:
+    def __init__(self, buttons) -> None:
+        if not isinstance(buttons, list):
+            raise Exception("Argument provided must a list")
+        self.buttons = buttons
+
+
 class Layout:
     def __init__(self, layouts):
         self.curr_layout_id = 0
         self.curr_inside_id = 0
         self.layouts = layouts
         self.layouts[0].buttons[0].current = True
-        pass
+       
+    def update(self, event, screen):
+        for layout in self.layouts:
+            for button in layout.buttons:
+                if button.check_clicked(event):
+                    button.animate(screen)
+                    break
 
-
-class ButtonLayout:
-    def __init__(self, buttons) -> None:
-        self.buttons = buttons
-
+                    
 
 class CheckBoxLayout:
     def __init__(
