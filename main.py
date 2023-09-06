@@ -24,6 +24,7 @@ def main_menu():
         x=settings.MID_WIDTH,
         y=first_button_y,
         active=True,
+        function=time_trial_menu,
     )
 
     countdown_button = Button(
@@ -33,6 +34,7 @@ def main_menu():
         x=settings.MID_WIDTH,
         y=first_button_y + settings.DISTANCE,
         active=True,
+        function=countdown_settings,
     )
     button_layout = ButtonLayout([training_button, countdown_button])
     layout = Layout([button_layout])
@@ -52,7 +54,7 @@ def main_menu():
             if countdown_button.check_clicked(event):
                 countdown_button.animate(screen)
                 countdown_settings()
-
+            # layout.update(event, screen)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
@@ -110,6 +112,8 @@ def time_trial_menu():
         mode="horizontal",
     )
     game_args = {}
+    button_layout = ButtonLayout([start_button])
+    layout = Layout([button_layout, options_layout, rounds_layout, digits_layout])
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text(
