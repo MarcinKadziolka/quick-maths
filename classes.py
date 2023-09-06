@@ -122,8 +122,8 @@ class Button:
         return action
 
     def run(self):
-        self.function()
-
+        if self.function:
+            self.function()
 
     def draw(self, screen):
         self.set_color()
@@ -137,17 +137,21 @@ class Button:
             screen=screen,
         )
 
-    def animate(self, screen):
-        self.draw(screen)
-        pygame.display.update()
-        sleep(settings.SLEEP_DURATION)
-
 
 class ButtonLayout:
     def __init__(self, buttons) -> None:
         if not isinstance(buttons, list):
             raise Exception("Argument provided must a list")
         self.buttons = buttons
+
+    def display(self, screen):
+        for button in self.buttons:
+            button.draw(screen)
+
+    def update(self, event):
+        for button in self.buttons:
+            if button.check_clicked(event):
+                button.run()
 
 
 class Layout:
@@ -156,15 +160,15 @@ class Layout:
         self.curr_inside_id = 0
         self.layouts = layouts
         self.layouts[0].buttons[0].current = True
-       
-    def update(self, event, screen):
-        for layout in self.layouts:
-            for button in layout.buttons:
-                if button.check_clicked(event):
-                    button.animate(screen)
-                    break
 
-                    
+    def update(self, event):
+        for layout in self.layouts:
+            layout.update(event)
+
+    def display(self, screen):
+        for layout in self.layouts:
+            layout.display(screen)
+
 
 class CheckBoxLayout:
     def __init__(
