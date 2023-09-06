@@ -1,11 +1,12 @@
 import pygame
 import settings
 import functions
-from classes import Button, TextField, CheckBoxLayout, Layout, ButtonLayout
+from classes import Button, TextField, CheckBoxLayout, Layout, ButtonLayout, Orientation, Direction
 import random
 import time
 import datetime
 import os
+from collections import defaultdict
 
 pygame.init()
 
@@ -13,6 +14,7 @@ pygame.init()
 screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
 pygame.display.set_caption("Quick Maths")
 
+GAME_ARGS = {}
 
 def main_menu():
     run = True
@@ -93,7 +95,7 @@ def time_trial_menu():
         x=checkboxes_x,
         y=checkboxes_y,
         distance=settings.DISTANCE,
-        mode="horizontal",
+        orientation=Orientation.HORIZONTAL,
     )
     digits_layout = CheckBoxLayout(
         texts=["1", "2", "3", "4"],
@@ -103,11 +105,14 @@ def time_trial_menu():
         x=checkboxes_x,
         y=checkboxes_y + settings.DISTANCE * 2,
         distance=settings.DISTANCE,
-        mode="horizontal",
+        orientation=Orientation.HORIZONTAL,
     )
-    game_args = {}
+    # game_args = {}
     button_layout = ButtonLayout([start_button])
-    layout = Layout([button_layout, options_layout, rounds_layout, digits_layout])
+    nav = {(0, 0, pygame.K_UP): (1, len(options_layout)-1)}
+    print(pygame.K_UP)
+    d_navigation = defaultdict(tuple, nav)
+    layout = Layout([button_layout, options_layout, rounds_layout, digits_layout], navigation=d_navigation)
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text(
@@ -148,16 +153,16 @@ def time_trial_menu():
         )
 
         layout.display(screen)
-        game_args["mode"] = options_layout.buttons[
+        GAME_ARGS["mode"] = options_layout.buttons[
             options_layout.active_id
         ].text.lower()
-        game_args["num_operations"] = int(
+        GAME_ARGS["num_operations"] = int(
             rounds_layout.buttons[rounds_layout.active_id].text
         )
-        game_args["num_digits"] = int(
+        GAME_ARGS["num_digits"] = int(
             digits_layout.buttons[digits_layout.active_id].text
         )
-        show_leaderboard(game_args=game_args, screen=screen, x=settings.SCREEN_THIRDS[0], y=150)
+        show_leaderboard(game_args=GAME_ARGS, screen=screen, x=settings.SCREEN_THIRDS[0], y=150)
         pygame.display.update()
 
 def show_leaderboard(game_args, screen, x, y):
@@ -214,7 +219,7 @@ def check_equation(answer, result):
     return integer_answer == result
 
 
-def time_trial(game_args):
+def time_trial():
     input_field = TextField(
         font=settings.equation_font_small,
         width=400,
@@ -237,9 +242,9 @@ def time_trial(game_args):
         active=True,
     )
     run = True
-    n = game_args["num_operations"]
+    n = GAME_ARGS["num_operations"]
 
-    equations = iter(get_all_equations(game_args["mode"], n, game_args["num_digits"]))
+    equations = iter(get_all_equations(GAME_ARGS["mode"], n, GAME_ARGS["num_digits"]))
     current_equation = next(equations)
     background_color = list(settings.colors.BACKGROUND)
     red_step = int((background_color[0]) / n)
@@ -273,7 +278,7 @@ def time_trial(game_args):
                     try:
                         current_equation = next(equations)
                     except StopIteration as _:
-                        run = results(background_color, elapsed_time, game_args)
+                        run = results(background_color, elapsed_time, GAME_ARGS)
                 else:
                     background_color[0] = min(background_color[0] + red_step, 255)
                     background_color[1] = max(background_color[1] - red_step, 0)
@@ -436,7 +441,7 @@ def countdown_settings():
         x=settings.MID_WIDTH,
         y=settings.MID_HEIGHT,
         distance=100,
-        mode="horizontal",
+        orientation=Orientation.HORIZONTAL,
     )
 
     start_button = Button(
@@ -499,7 +504,7 @@ def countdown(n_big):
         x=settings.MID_WIDTH,
         y=settings.MID_HEIGHT,
         distance=100,
-        mode="horizontal",
+        orientation=Orientation.HORIZONTAL,
         inactive_color=settings.colors.WHITE,
     )
 
