@@ -3,6 +3,8 @@ import pygame
 import functions
 from time import sleep
 import settings
+from enum import Enum
+from collections import defaultdict
 
 
 class Button:
@@ -138,6 +140,11 @@ class Button:
         )
 
 
+class Orientation(Enum):
+    HORIZONTAL = 0
+    VERTICAL = 1
+
+
 class ButtonLayout:
     def __init__(self, buttons) -> None:
         if not isinstance(buttons, list):
@@ -153,15 +160,48 @@ class ButtonLayout:
             if button.check_clicked(event):
                 button.run()
 
+    def __len__(self):
+        return len(self.buttons)
+
+
+class Direction(Enum):
+    UP = 0
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
+
 
 class Layout:
-    def __init__(self, layouts):
-        self.curr_layout_id = 0
-        self.curr_inside_id = 0
+    def __init__(self, layouts, navigation=defaultdict(lambda: None)):
+        self.layout_id = 0
+        self.button_id = 0
         self.layouts = layouts
-        self.layouts[0].buttons[0].current = True
+        self.layouts[self.layout_id].buttons[self.button_id].current = True
+        self.navigation = navigation
+        # if out of bound
+        # if exit
+        # correct exit is (layout, button, direction) -> (layout, button)
+
+    def get_next_id(self, event):
+        curr_layout = self.layouts[self.layout_id]
+        n_buttons = len(curr_layout)
+        if event.type != pygame.KEYDOWN:
+            return
+        if target := self.navigation[(self.layout_id, self.button_id, event.key)]:
+            self.layout_id, self.button_id = target[0], target[1]
+            return
+        if event.key in (pygame.K_DOWN, pygame.K_RIGHT):
+            if self.button_id + 1 < n_buttons:
+                self.button_id += 1
+        elif event.key in (pygame.K_UP, pygame.K_LEFT):
+            if self.button_id - 1 >= 0:
+                self.button_id -= 1
 
     def update(self, event):
+        self.layouts[self.layout_id].buttons[self.button_id].current = False
+        self.get_next_id(event)
+        self.layouts[self.layout_id].buttons[self.button_id].current = True
+
         for layout in self.layouts:
             layout.update(event)
 
@@ -181,7 +221,7 @@ class CheckBoxLayout:
         y,
         distance,
         center=True,
-        mode="vertical",
+        orientation=Orientation.VERTICAL,
         inactive_color=settings.colors.GRAY,
     ) -> None:
         self.num_buttons = len(texts)
@@ -192,10 +232,12 @@ class CheckBoxLayout:
 
         if center:
             half_length = ((self.num_buttons - 1) * distance) / 2
-            if mode == "horizontal":
+            if orientation == Orientation.HORIZONTAL:
                 self.start_x = x - half_length
-            elif mode == "vertical":
+            elif orientation == Orientation.VERTICAL:
                 self.start_y = y - half_length
+            else:
+                raise Exception("Invalid orientation")
 
         for i, text in enumerate(texts):
             self.buttons.append(
@@ -209,9 +251,9 @@ class CheckBoxLayout:
                     inactive_color=inactive_color,
                 )
             )
-            if mode == "horizontal":
+            if orientation == Orientation.HORIZONTAL:
                 self.start_x += distance
-            else:
+            elif orientation == Orientation.VERTICAL:
                 self.start_y += distance
 
     def display(self, screen):
@@ -225,6 +267,9 @@ class CheckBoxLayout:
                 for other_button in self.buttons:
                     other_button.active = button == other_button
                 break
+
+    def __len__(self):
+        return len(self.buttons)
 
 
 class TextField:
