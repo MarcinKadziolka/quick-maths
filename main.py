@@ -48,20 +48,13 @@ def main_menu():
             screen=screen,
         )
         for event in pygame.event.get():
-            if training_button.check_clicked(event):
-                training_button.animate(screen)
-                time_trial_menu()
-            if countdown_button.check_clicked(event):
-                countdown_button.animate(screen)
-                countdown_settings()
-            # layout.update(event, screen)
+            layout.update(event)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
             if event.type == pygame.QUIT:
                 run = False
-        training_button.draw(screen)
-        countdown_button.draw(screen)
+        layout.display(screen)
         pygame.display.update()
     pygame.quit()
 
@@ -76,6 +69,7 @@ def time_trial_menu():
         x=settings.MID_WIDTH,
         y=600,
         active=True,
+        function=time_trial
     )
 
     options_layout = CheckBoxLayout(
@@ -133,13 +127,7 @@ def time_trial_menu():
         )
 
         for event in pygame.event.get():
-            options_layout.update(event)
-            digits_layout.update(event)
-            rounds_layout.update(event)
-
-            if start_button.check_clicked(event):
-                start_button.animate(screen)
-                time_trial(game_args)
+            layout.update(event)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
@@ -159,11 +147,7 @@ def time_trial_menu():
             screen=screen,
         )
 
-        start_button.draw(screen)
-        rounds_layout.display(screen)
-        digits_layout.display(screen)
-        options_layout.display(screen)
-
+        layout.display(screen)
         game_args["mode"] = options_layout.buttons[
             options_layout.active_id
         ].text.lower()
