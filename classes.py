@@ -78,7 +78,7 @@ class Button:
     def draw_up(self, screen):
         pos = pygame.mouse.get_pos()
 
-        if self.hitbox.collidepoint(pos):
+        if self.hitbox.collidepoint(pos) or self.current:
             self.button = pygame.Rect(
                 0, 0, self.width + self.hover_size, self.height + self.hover_size
             )
