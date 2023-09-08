@@ -17,8 +17,10 @@ class Button:
         text_color=settings.colors.BLACK,
         color=settings.colors.WHITE,
         shadow_color=settings.colors.BLACK,
-        active=False,
         inactive_color=settings.colors.GRAY,
+        current_color=settings.colors.GREEN,
+        active_and_current_color=settings.colors.LIGHT_GREEN,
+        active=False,
         on_hover=True,
         function=None,
     ):
@@ -34,11 +36,13 @@ class Button:
         self.shadow.center = x, y + 5
         self.border_radius = 5
 
-        self.color = color
+        self.active_color = color
         self.shadow_color = shadow_color
         self.inactive_color = inactive_color
         self.text_color = text_color
-        self.current_color = settings.COLORS.GREEN
+        self.current_color = current_color
+        self.active_and_current_color = active_and_current_color
+
         self.text = text
         self.font = font
 
@@ -58,9 +62,11 @@ class Button:
 
     def set_color(self):
         self.color_to_display = (
-            self.current_color
+            self.active_and_current_color
+            if (self.active and self.current)
+            else self.current_color
             if self.current
-            else self.color
+            else self.active_color
             if self.active
             else self.inactive_color
         )
@@ -75,25 +81,22 @@ class Button:
             border_radius=self.border_radius,
         )
 
+    def set_size(self, popup=False):
+        size = (
+            (self.width + self.hover_size, self.height + self.hover_size)
+            if popup
+            else (self.width, self.height)
+        )
+        self.button = pygame.Rect(0, 0, *size)
+        self.shadow = pygame.Rect(0, 0, *size)
+        self.button.center = (
+            (self.x, self.y - self.hover_pop) if popup else (self.x, self.y)
+        )
+        self.shadow.center = (self.x, self.y + 5) if popup else (self.x, self.y + 5)
+
     def draw_up(self, screen):
         pos = pygame.mouse.get_pos()
-
-        if self.hitbox.collidepoint(pos) or self.current:
-            self.button = pygame.Rect(
-                0, 0, self.width + self.hover_size, self.height + self.hover_size
-            )
-            self.shadow = pygame.Rect(
-                0, 0, self.width + self.hover_size, self.height + self.hover_size
-            )
-            self.button.center = self.x, self.y - self.hover_pop
-            self.shadow.center = self.x, self.y + 5
-
-        else:
-            self.button = pygame.Rect(0, 0, self.width, self.height)
-            self.shadow = pygame.Rect(0, 0, self.width, self.height)
-            self.button.center = self.x, self.y
-            self.shadow.center = self.x, self.y + 5
-
+        self.set_size(self.hitbox.collidepoint(pos) or self.current)
         pygame.draw.rect(
             screen,
             self.shadow_color,
@@ -110,38 +113,33 @@ class Button:
         )
 
     def check_clicked(self):
-        action = False
         pos = pygame.mouse.get_pos()
         left_click = pygame.mouse.get_pressed()[0]
         if self.button.collidepoint(pos) and left_click and not self.clicked:
             self.clicked = True
-
         if left_click == 0 and self.clicked:
             self.clicked = False
-            action = True
-
-        return action
+            return True
+        return False
 
     def check_pressed(self, event):
         if not self.current:
             return
-        action = False
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
             if not self.pressed:
                 self.pressed = True
         elif event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
             if self.pressed:
                 self.pressed = False
-                action = True
+                return True
+        return False
 
-        return action
-    
     def check_action(self, event):
         return self.check_pressed(event) or self.check_clicked()
 
     def check_down(self):
         return self.clicked or self.pressed
-    
+
     def run(self):
         if self.function:
             self.function()
@@ -181,6 +179,7 @@ class ButtonLayout:
 
     def __len__(self):
         return len(self.buttons)
+
 
 class Navigation:
     def __init__(self, layouts, navigation=defaultdict(lambda: None)):
