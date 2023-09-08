@@ -169,16 +169,13 @@ class Direction(Enum):
     LEFT = 3
 
 
-class Layout:
+class Navigation:
     def __init__(self, layouts, navigation=defaultdict(lambda: None)):
         self.layout_id = 0
         self.button_id = 0
         self.layouts = layouts
         self.layouts[self.layout_id].buttons[self.button_id].current = True
         self.navigation = navigation
-        # if out of bound
-        # if exit
-        # correct exit is (layout, button, direction) -> (layout, button)
 
     def get_next_id(self, event):
         curr_layout = self.layouts[self.layout_id]
@@ -199,13 +196,6 @@ class Layout:
         self.layouts[self.layout_id].buttons[self.button_id].current = False
         self.get_next_id(event)
         self.layouts[self.layout_id].buttons[self.button_id].current = True
-
-        for layout in self.layouts:
-            layout.update(event)
-
-    def display(self, screen):
-        for layout in self.layouts:
-            layout.display(screen)
 
 
 class CheckBoxLayout:
