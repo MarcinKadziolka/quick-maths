@@ -58,7 +58,7 @@ def main_menu():
             if training_button.check_action(event):
                 time_trial_menu()
             if countdown_button.check_action(event):
-                time_trial_menu()
+                countdown_menu()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -177,7 +177,7 @@ def time_trial_menu():
             digits_layout.update(event)
             options_layout.update(event)
             rounds_layout.update(event)
-            if start_button.check_clicked():
+            if start_button.check_action(event):
                 time_trial(game_args)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -308,6 +308,8 @@ def time_trial(game_args):
 
     num_equations = n
     current_equation_index = 1
+
+    answer_button.current = True
     while run:
         elapsed_time = f"{time.time() - start:.2f}"
         screen.fill(background_color)
@@ -320,8 +322,7 @@ def time_trial(game_args):
         )
         for event in pygame.event.get():
             input_field.get_event(event)
-
-            if answer_button.check_clicked():
+            if answer_button.check_action(event):
                 if input_field.user_input == "":
                     pass
                 elif check_equation(input_field.user_input, current_equation[2]):
@@ -442,6 +443,8 @@ def results(background_color, elapsed_time, game_args):
         y=first_button_y + settings.DISTANCE * 2,
         active=True,
     )
+    button_layout = ButtonLayout([save_button, try_again_button])
+    navigation = Navigation([button_layout])
     while run:
         screen.fill(background_color)
         functions.draw_text(
@@ -452,13 +455,14 @@ def results(background_color, elapsed_time, game_args):
             screen=screen,
         )
         for event in pygame.event.get():
+            navigation.update(event)
             input_field.get_event(event)
-            if save_button.check_clicked():
+            if save_button.check_action(event):
                 save(game_args, input_field.user_input, elapsed_time)
                 save_button.active = False
-
-            if try_again_button.check_clicked():
+            if try_again_button.check_action(event):
                 return False
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
