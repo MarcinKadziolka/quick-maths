@@ -5,7 +5,7 @@ from classes import (
     Button,
     TextField,
     CheckBoxLayout,
-    Layout,
+    Navigation,
     ButtonLayout,
     Orientation,
     Direction,
@@ -22,9 +22,6 @@ pygame.init()
 screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
 pygame.display.set_caption("Quick Maths")
 
-GAME_ARGS = {}
-N_BIG = None
-
 
 def main_menu():
     run = True
@@ -36,7 +33,6 @@ def main_menu():
         x=settings.MID_WIDTH,
         y=first_button_y,
         active=True,
-        function=time_trial_menu,
     )
 
     countdown_button = Button(
@@ -46,10 +42,9 @@ def main_menu():
         x=settings.MID_WIDTH,
         y=first_button_y + settings.DISTANCE,
         active=True,
-        function=countdown_menu,
     )
     button_layout = ButtonLayout([training_button, countdown_button])
-    layout = Layout([button_layout])
+    layout = Navigation([button_layout])
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text(
@@ -61,12 +56,18 @@ def main_menu():
         )
         for event in pygame.event.get():
             layout.update(event)
+            if training_button.check_clicked(event):
+                time_trial_menu()
+            if countdown_button.check_clicked(event):
+                countdown_menu()
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
             if event.type == pygame.QUIT:
                 run = False
-        layout.display(screen)
+        training_button.draw(screen)
+        countdown_button.draw(screen)
         pygame.display.update()
     pygame.quit()
 
@@ -149,10 +150,11 @@ def time_trial_menu():
         (2, 3, pygame.K_DOWN): (3, 3),
     }
     d_navigation = defaultdict(tuple, nav)
-    layout = Layout(
+    navigation = Navigation(
         [button_layout, options_layout, rounds_layout, digits_layout],
         navigation=d_navigation,
     )
+    game_args = {}
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text(
@@ -172,7 +174,12 @@ def time_trial_menu():
         )
 
         for event in pygame.event.get():
-            layout.update(event)
+            navigation.update(event)
+            digits_layout.update(event)
+            options_layout.update(event)
+            rounds_layout.update(event)
+            if start_button.check_clicked(event):
+                time_trial(game_args)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
@@ -192,18 +199,22 @@ def time_trial_menu():
             screen=screen,
         )
 
-        layout.display(screen)
-        GAME_ARGS["mode"] = options_layout.buttons[
+        digits_layout.display(screen)
+        options_layout.display(screen)
+        rounds_layout.display(screen)
+        start_button.draw(screen)
+
+        game_args["mode"] = options_layout.buttons[
             options_layout.active_id
         ].text.lower()
-        GAME_ARGS["num_operations"] = int(
+        game_args["num_operations"] = int(
             rounds_layout.buttons[rounds_layout.active_id].text
         )
-        GAME_ARGS["num_digits"] = int(
+        game_args["num_digits"] = int(
             digits_layout.buttons[digits_layout.active_id].text
         )
         show_leaderboard(
-            game_args=GAME_ARGS, screen=screen, x=settings.SCREEN_THIRDS[0], y=150
+            game_args=game_args, screen=screen, x=settings.SCREEN_THIRDS[0], y=150
         )
         pygame.display.update()
 
@@ -263,7 +274,7 @@ def check_equation(answer, result):
     return integer_answer == result
 
 
-def time_trial():
+def time_trial(game_args):
     input_field = TextField(
         font=settings.equation_font_small,
         width=400,
@@ -286,9 +297,9 @@ def time_trial():
         active=True,
     )
     run = True
-    n = GAME_ARGS["num_operations"]
+    n = game_args["num_operations"]
 
-    equations = iter(get_all_equations(GAME_ARGS["mode"], n, GAME_ARGS["num_digits"]))
+    equations = iter(get_all_equations(game_args["mode"], n, game_args["num_digits"]))
     current_equation = next(equations)
     background_color = list(settings.colors.BACKGROUND)
     red_step = int((background_color[0]) / n)
@@ -322,7 +333,7 @@ def time_trial():
                     try:
                         current_equation = next(equations)
                     except StopIteration as _:
-                        run = results(background_color, elapsed_time, GAME_ARGS)
+                        run = results(background_color, elapsed_time, game_args)
                 else:
                     background_color[0] = min(background_color[0] + red_step, 255)
                     background_color[1] = max(background_color[1] - red_step, 0)
@@ -478,7 +489,6 @@ def results(background_color, elapsed_time, game_args):
 
 
 def countdown_menu():
-    global N_BIG
     run = True
     options_layout = CheckBoxLayout(
         ["0", "1", "2", "3", "4"],
@@ -516,7 +526,7 @@ def countdown_menu():
         (1, 4, pygame.K_DOWN): (0, 0),
     }
     navigation = defaultdict(tuple, nav)
-    layout = Layout([start_layout, options_layout], navigation)
+    layout = Navigation([start_layout, options_layout], navigation)
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text(
@@ -535,7 +545,11 @@ def countdown_menu():
         )
 
         for event in pygame.event.get():
-            N_BIG = int(options_layout.buttons[options_layout.active_id].text)
+            if start_button.check_clicked(event):
+                n_big = int(options_layout.buttons[options_layout.active_id].text)
+                countdown(n_big)
+            options_layout.update(event)
+
             layout.update(event)
 
             if event.type == pygame.KEYDOWN:
@@ -543,14 +557,15 @@ def countdown_menu():
                     run = False
             if event.type == pygame.QUIT:
                 run = False
-        layout.display(screen)
+        options_layout.display(screen)
+        start_button.draw(screen)
         pygame.display.update()
 
 
-def countdown():
+def countdown(n_big):
     run = True
-    nums = random.sample([25, 50, 75, 100], N_BIG)
-    small_nums = random.sample(range(1, 11), counts=[2 for _ in range(10)], k=6 - N_BIG)
+    nums = random.sample([25, 50, 75, 100], n_big)
+    small_nums = random.sample(range(1, 11), counts=[2 for _ in range(10)], k=6 - n_big)
     nums.extend(small_nums)
     random.shuffle(nums)
     target = random.randint(101, 999)
