@@ -43,8 +43,9 @@ class Button:
         self.font = font
 
         self.clicked = False
-        self.active = active
+        self.pressed = False
         self.current = False
+        self.active = active
 
         self.function = function
 
@@ -108,7 +109,7 @@ class Button:
             border_radius=self.border_radius,
         )
 
-    def check_clicked(self, event):
+    def check_clicked(self):
         action = False
         pos = pygame.mouse.get_pos()
         left_click = pygame.mouse.get_pressed()[0]
@@ -121,13 +122,33 @@ class Button:
 
         return action
 
+    def check_pressed(self, event):
+        if not self.current:
+            return
+        action = False
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            if not self.pressed:
+                self.pressed = True
+        elif event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
+            if self.pressed:
+                self.pressed = False
+                action = True
+
+        return action
+    
+    def check_action(self, event):
+        return self.check_pressed(event) or self.check_clicked()
+
+    def check_down(self):
+        return self.clicked or self.pressed
+    
     def run(self):
         if self.function:
             self.function()
 
     def draw(self, screen):
         self.set_color()
-        self.draw_down(screen) if self.clicked else self.draw_up(screen)
+        self.draw_down(screen) if self.check_down() else self.draw_up(screen)
         functions.draw_text(
             text=self.text,
             text_color=self.text_color,
@@ -155,19 +176,11 @@ class ButtonLayout:
 
     def update(self, event):
         for button in self.buttons:
-            if button.check_clicked(event):
+            if button.check_clicked():
                 button.run()
 
     def __len__(self):
         return len(self.buttons)
-
-
-class Direction(Enum):
-    UP = 0
-    RIGHT = 1
-    DOWN = 2
-    LEFT = 3
-
 
 class Navigation:
     def __init__(self, layouts, navigation=defaultdict(lambda: None)):
@@ -250,7 +263,7 @@ class CheckBoxLayout:
 
     def update(self, event):
         for i, button in enumerate(self.buttons):
-            if button.check_clicked(event):
+            if button.check_clicked():
                 self.active_id = i
                 for other_button in self.buttons:
                     other_button.active = button == other_button
