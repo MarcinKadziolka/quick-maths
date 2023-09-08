@@ -1,7 +1,15 @@
 import pygame
 import settings
 import functions
-from classes import Button, TextField, CheckBoxLayout, Layout, ButtonLayout, Orientation, Direction
+from classes import (
+    Button,
+    TextField,
+    CheckBoxLayout,
+    Layout,
+    ButtonLayout,
+    Orientation,
+    Direction,
+)
 import random
 import time
 import datetime
@@ -15,6 +23,8 @@ screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
 pygame.display.set_caption("Quick Maths")
 
 GAME_ARGS = {}
+N_BIG = None
+
 
 def main_menu():
     run = True
@@ -36,7 +46,7 @@ def main_menu():
         x=settings.MID_WIDTH,
         y=first_button_y + settings.DISTANCE,
         active=True,
-        function=countdown_settings,
+        function=countdown_menu,
     )
     button_layout = ButtonLayout([training_button, countdown_button])
     layout = Layout([button_layout])
@@ -71,7 +81,7 @@ def time_trial_menu():
         x=settings.MID_WIDTH,
         y=600,
         active=True,
-        function=time_trial
+        function=time_trial,
     )
 
     options_layout = CheckBoxLayout(
@@ -114,31 +124,35 @@ def time_trial_menu():
                     3 digits_layout
     0 start_button
     """
-            # start_button nav
-    nav = {(0, 0, pygame.K_UP): (1, 2),
-            # options_layout nav
-           (1, 0, pygame.K_RIGHT): (2, 0),
-           (1, 2, pygame.K_RIGHT): (3, 0),
-           (1, 2, pygame.K_DOWN): (0, 0),
-            # digits_layout nav 
-           (3, 0, pygame.K_LEFT): (1, 2),
-           (3, 0, pygame.K_DOWN): (0, 0),
-           (3, 1, pygame.K_DOWN): (0, 0),
-           (3, 2, pygame.K_DOWN): (0, 0),
-           (3, 3, pygame.K_DOWN): (0, 0),
-           (3, 0, pygame.K_UP): (2, 0),
-           (3, 1, pygame.K_UP): (2, 1),
-           (3, 2, pygame.K_UP): (2, 2),
-           (3, 3, pygame.K_UP): (2, 3),
-           # rounds_layout nav
-           (2, 0, pygame.K_LEFT): (1, 0),
-           (2, 0, pygame.K_DOWN): (3, 0),
-           (2, 1, pygame.K_DOWN): (3, 1),
-           (2, 2, pygame.K_DOWN): (3, 2),
-           (2, 3, pygame.K_DOWN): (3, 3),
-           }
+    # start_button nav
+    nav = {
+        (0, 0, pygame.K_UP): (1, 2),
+        # options_layout nav
+        (1, 0, pygame.K_RIGHT): (2, 0),
+        (1, 2, pygame.K_RIGHT): (3, 0),
+        (1, 2, pygame.K_DOWN): (0, 0),
+        # digits_layout nav
+        (3, 0, pygame.K_LEFT): (1, 2),
+        (3, 0, pygame.K_DOWN): (0, 0),
+        (3, 1, pygame.K_DOWN): (0, 0),
+        (3, 2, pygame.K_DOWN): (0, 0),
+        (3, 3, pygame.K_DOWN): (0, 0),
+        (3, 0, pygame.K_UP): (2, 0),
+        (3, 1, pygame.K_UP): (2, 1),
+        (3, 2, pygame.K_UP): (2, 2),
+        (3, 3, pygame.K_UP): (2, 3),
+        # rounds_layout nav
+        (2, 0, pygame.K_LEFT): (1, 0),
+        (2, 0, pygame.K_DOWN): (3, 0),
+        (2, 1, pygame.K_DOWN): (3, 1),
+        (2, 2, pygame.K_DOWN): (3, 2),
+        (2, 3, pygame.K_DOWN): (3, 3),
+    }
     d_navigation = defaultdict(tuple, nav)
-    layout = Layout([button_layout, options_layout, rounds_layout, digits_layout], navigation=d_navigation)
+    layout = Layout(
+        [button_layout, options_layout, rounds_layout, digits_layout],
+        navigation=d_navigation,
+    )
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text(
@@ -188,8 +202,11 @@ def time_trial_menu():
         GAME_ARGS["num_digits"] = int(
             digits_layout.buttons[digits_layout.active_id].text
         )
-        show_leaderboard(game_args=GAME_ARGS, screen=screen, x=settings.SCREEN_THIRDS[0], y=150)
+        show_leaderboard(
+            game_args=GAME_ARGS, screen=screen, x=settings.SCREEN_THIRDS[0], y=150
+        )
         pygame.display.update()
+
 
 def show_leaderboard(game_args, screen, x, y):
     leaderboard = read_results(game_args)
@@ -202,6 +219,7 @@ def show_leaderboard(game_args, screen, x, y):
             y=y + i * 50,
             screen=screen,
         )
+
 
 def get_equation(operator, digits):
     if operator == "*" and digits == 1:
@@ -348,9 +366,7 @@ def time_trial():
 
 def save(game_args, name, result):
     # save to csv
-    file_name = (
-        f"{game_args['mode']}_no_{game_args['num_operations']}_nd_{game_args['num_digits']}"
-    )
+    file_name = f"{game_args['mode']}_no_{game_args['num_operations']}_nd_{game_args['num_digits']}"
     date = datetime.datetime.now().strftime("%Y-%m-%d")
     if not os.path.exists("results"):
         os.makedirs("results")
@@ -448,7 +464,9 @@ def results(background_color, elapsed_time, game_args):
             screen=screen,
         )
 
-        show_leaderboard(game_args=game_args, screen=screen, x=settings.SCREEN_THIRDS[0], y=150)
+        show_leaderboard(
+            game_args=game_args, screen=screen, x=settings.SCREEN_THIRDS[0], y=150
+        )
 
         try_again_button.draw(screen)
         save_button.draw(screen)
@@ -457,7 +475,10 @@ def results(background_color, elapsed_time, game_args):
     pygame.quit()
 
 
-def countdown_settings():
+
+
+def countdown_menu():
+    global N_BIG
     run = True
     options_layout = CheckBoxLayout(
         ["0", "1", "2", "3", "4"],
@@ -477,8 +498,25 @@ def countdown_settings():
         x=settings.MID_WIDTH,
         y=settings.MID_HEIGHT + 200,
         active=True,
+        function=countdown
     )
-
+    start_layout = ButtonLayout([start_button])
+    """
+    options_layout
+        start
+    """
+    # start nav
+    nav = {
+        (0, 0, pygame.K_UP): (1, 2),
+        # options_layout nav
+        (1, 0, pygame.K_DOWN): (0, 0),
+        (1, 1, pygame.K_DOWN): (0, 0),
+        (1, 2, pygame.K_DOWN): (0, 0),
+        (1, 3, pygame.K_DOWN): (0, 0),
+        (1, 4, pygame.K_DOWN): (0, 0),
+    }
+    navigation = defaultdict(tuple, nav)
+    layout = Layout([start_layout, options_layout], navigation)
     while run:
         screen.fill(settings.colors.BACKGROUND)
         functions.draw_text(
@@ -497,27 +535,22 @@ def countdown_settings():
         )
 
         for event in pygame.event.get():
-            options_layout.update(event)
-
-            if start_button.check_clicked(event):
-                start_button.animate(screen)
-                n_big = int(options_layout.buttons[options_layout.active_id].text)
-                countdown(n_big)
+            N_BIG = int(options_layout.buttons[options_layout.active_id].text)
+            layout.update(event)
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
             if event.type == pygame.QUIT:
                 run = False
-        options_layout.display(screen)
-        start_button.draw(screen)
+        layout.display(screen)
         pygame.display.update()
 
 
-def countdown(n_big):
+def countdown():
     run = True
-    nums = random.sample([25, 50, 75, 100], n_big)
-    small_nums = random.sample(range(1, 11), counts=[2 for _ in range(10)], k=6 - n_big)
+    nums = random.sample([25, 50, 75, 100], N_BIG)
+    small_nums = random.sample(range(1, 11), counts=[2 for _ in range(10)], k=6 - N_BIG)
     nums.extend(small_nums)
     random.shuffle(nums)
     target = random.randint(101, 999)
@@ -574,7 +607,6 @@ def countdown(n_big):
         )
         for event in pygame.event.get():
             if next_button.check_clicked(event):
-                next_button.animate(screen)
                 return
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
