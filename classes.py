@@ -1,7 +1,5 @@
-from typing import List
 import pygame
 import functions
-from time import sleep
 import settings
 from enum import Enum
 from collections import defaultdict
