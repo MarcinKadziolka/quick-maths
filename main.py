@@ -8,7 +8,6 @@ from classes import (
     Navigation,
     ButtonLayout,
     Orientation,
-    Direction,
 )
 import random
 import time
@@ -56,10 +55,10 @@ def main_menu():
         )
         for event in pygame.event.get():
             layout.update(event)
-            if training_button.check_clicked(event):
+            if training_button.check_action(event):
                 time_trial_menu()
-            if countdown_button.check_clicked(event):
-                countdown_menu()
+            if countdown_button.check_action(event):
+                time_trial_menu()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -178,7 +177,7 @@ def time_trial_menu():
             digits_layout.update(event)
             options_layout.update(event)
             rounds_layout.update(event)
-            if start_button.check_clicked(event):
+            if start_button.check_clicked():
                 time_trial(game_args)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -322,7 +321,7 @@ def time_trial(game_args):
         for event in pygame.event.get():
             input_field.get_event(event)
 
-            if answer_button.check_clicked(event):
+            if answer_button.check_clicked():
                 if input_field.user_input == "":
                     pass
                 elif check_equation(input_field.user_input, current_equation[2]):
@@ -454,11 +453,11 @@ def results(background_color, elapsed_time, game_args):
         )
         for event in pygame.event.get():
             input_field.get_event(event)
-            if save_button.check_clicked(event):
+            if save_button.check_clicked():
                 save(game_args, input_field.user_input, elapsed_time)
                 save_button.active = False
 
-            if try_again_button.check_clicked(event):
+            if try_again_button.check_clicked():
                 return False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -486,8 +485,6 @@ def results(background_color, elapsed_time, game_args):
     pygame.quit()
 
 
-
-
 def countdown_menu():
     run = True
     options_layout = CheckBoxLayout(
@@ -508,7 +505,7 @@ def countdown_menu():
         x=settings.MID_WIDTH,
         y=settings.MID_HEIGHT + 200,
         active=True,
-        function=countdown
+        function=countdown,
     )
     start_layout = ButtonLayout([start_button])
     """
@@ -545,7 +542,7 @@ def countdown_menu():
         )
 
         for event in pygame.event.get():
-            if start_button.check_clicked(event):
+            if start_button.check_clicked():
                 n_big = int(options_layout.buttons[options_layout.active_id].text)
                 countdown(n_big)
             options_layout.update(event)
@@ -621,7 +618,7 @@ def countdown(n_big):
             screen=screen,
         )
         for event in pygame.event.get():
-            if next_button.check_clicked(event):
+            if next_button.check_clicked():
                 return
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
