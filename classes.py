@@ -22,7 +22,6 @@ class Button:
         active_and_current_color=settings.colors.LIGHT_GREEN,
         active=False,
         on_hover=True,
-        function=None,
     ):
         self.x = x
         self.y = y
@@ -50,8 +49,6 @@ class Button:
         self.pressed = False
         self.current = False
         self.active = active
-
-        self.function = function
 
         if on_hover:
             self.hover_size = 2
@@ -139,10 +136,6 @@ class Button:
 
     def check_down(self):
         return self.clicked or self.pressed
-
-    def run(self):
-        if self.function:
-            self.function()
 
     def draw(self, screen):
         self.set_color()
