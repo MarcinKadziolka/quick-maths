@@ -107,10 +107,36 @@ def time_trial_menu():
         distance=settings.DISTANCE,
         orientation=Orientation.HORIZONTAL,
     )
-    # game_args = {}
     button_layout = ButtonLayout([start_button])
-    nav = {(0, 0, pygame.K_UP): (1, len(options_layout)-1)}
-    print(pygame.K_UP)
+    """
+                    2 rounds_layout
+    1 options_layout
+                    3 digits_layout
+    0 start_button
+    """
+            # start_button nav
+    nav = {(0, 0, pygame.K_UP): (1, 2),
+            # options_layout nav
+           (1, 0, pygame.K_RIGHT): (2, 0),
+           (1, 2, pygame.K_RIGHT): (3, 0),
+           (1, 2, pygame.K_DOWN): (0, 0),
+            # digits_layout nav 
+           (3, 0, pygame.K_LEFT): (1, 2),
+           (3, 0, pygame.K_DOWN): (0, 0),
+           (3, 1, pygame.K_DOWN): (0, 0),
+           (3, 2, pygame.K_DOWN): (0, 0),
+           (3, 3, pygame.K_DOWN): (0, 0),
+           (3, 0, pygame.K_UP): (2, 0),
+           (3, 1, pygame.K_UP): (2, 1),
+           (3, 2, pygame.K_UP): (2, 2),
+           (3, 3, pygame.K_UP): (2, 3),
+           # rounds_layout nav
+           (2, 0, pygame.K_LEFT): (1, 0),
+           (2, 0, pygame.K_DOWN): (3, 0),
+           (2, 1, pygame.K_DOWN): (3, 1),
+           (2, 2, pygame.K_DOWN): (3, 2),
+           (2, 3, pygame.K_DOWN): (3, 3),
+           }
     d_navigation = defaultdict(tuple, nav)
     layout = Layout([button_layout, options_layout, rounds_layout, digits_layout], navigation=d_navigation)
     while run:
