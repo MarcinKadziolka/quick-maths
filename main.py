@@ -81,7 +81,6 @@ def time_trial_menu():
         x=settings.MID_WIDTH,
         y=600,
         active=True,
-        function=time_trial,
     )
 
     options_layout = CheckBoxLayout(
@@ -178,6 +177,7 @@ def time_trial_menu():
             options_layout.update(event)
             rounds_layout.update(event)
             if start_button.check_action(event):
+                loading(seconds=3)
                 time_trial(game_args)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -272,6 +272,37 @@ def check_equation(answer, result):
         return False
     return integer_answer == result
 
+def loading(seconds):
+    if seconds <= 1:
+        raise Exception("Time must be an integer")
+    timer_event = pygame.USEREVENT + 1
+    pygame.time.set_timer(timer_event, 1000)
+    counter = seconds
+    run = True
+    while run:
+        screen.fill(settings.colors.BACKGROUND)
+        functions.draw_text(
+            text=counter,
+            font=settings.main_font,
+            x=settings.MID_WIDTH,
+            y=settings.SCREEN_HEIGHT - 500,
+            screen=screen,
+            center=True
+        )
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    run = False
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == timer_event:
+                counter -= 1
+                if counter == 0:
+                    pygame.time.set_timer(timer_event, 0)
+                    return
+        pygame.display.update()
+    pygame.quit()
+    
 
 def time_trial(game_args):
     input_field = TextField(
@@ -314,7 +345,7 @@ def time_trial(game_args):
         elapsed_time = f"{time.time() - start:.2f}"
         screen.fill(background_color)
         functions.draw_text(
-            text="Game",
+            text="Time trial",
             font=settings.main_font,
             x=settings.MID_WIDTH,
             y=70,
@@ -352,10 +383,9 @@ def time_trial(game_args):
 
         functions.draw_text(
             text=f"{current_equation_index}/{num_equations}",
-            x=settings.SCREEN_WIDTH - 100,
-            y=30,
+            x=settings.SCREEN_THIRDS[2],
+            y=70,
             screen=screen,
-            center=False,
         )
         functions.draw_text(
             text=f"{current_equation[0]} {current_equation[3]} {current_equation[1]}",
@@ -366,10 +396,9 @@ def time_trial(game_args):
         )
         functions.draw_text(
             elapsed_time,
-            x=100,
-            y=30,
+            x=settings.SCREEN_THIRDS[0],
+            y=70,
             screen=screen,
-            center=False,
         )
 
         pygame.display.update()
@@ -509,7 +538,6 @@ def countdown_menu():
         x=settings.MID_WIDTH,
         y=settings.MID_HEIGHT + 200,
         active=True,
-        function=countdown,
     )
     start_layout = ButtonLayout([start_button])
     """
@@ -546,8 +574,9 @@ def countdown_menu():
         )
 
         for event in pygame.event.get():
-            if start_button.check_clicked():
+            if start_button.check_action(event):
                 n_big = int(options_layout.buttons[options_layout.active_id].text)
+                loading(seconds=3)
                 countdown(n_big)
             options_layout.update(event)
 
@@ -596,6 +625,8 @@ def countdown(n_big):
     pygame.time.set_timer(timer_event, 1000)
     counter = 30
     background_color = settings.colors.BACKGROUND
+    button_layout = ButtonLayout([next_button])
+    navigation = Navigation([button_layout])
     while run:
         screen.fill(background_color)
         functions.draw_text(
@@ -622,8 +653,9 @@ def countdown(n_big):
             screen=screen,
         )
         for event in pygame.event.get():
-            if next_button.check_clicked():
+            if next_button.check_action(event):
                 return
+            navigation.update(event)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
