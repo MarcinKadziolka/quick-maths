@@ -14,6 +14,7 @@ import time
 import datetime
 import os
 from collections import defaultdict
+import sqlite3
 
 pygame.init()
 
@@ -272,6 +273,7 @@ def check_equation(answer, result):
         return False
     return integer_answer == result
 
+
 def loading(seconds):
     if seconds <= 1:
         raise Exception("Time must be an integer")
@@ -287,7 +289,7 @@ def loading(seconds):
             x=settings.MID_WIDTH,
             y=settings.SCREEN_HEIGHT - 500,
             screen=screen,
-            center=True
+            center=True,
         )
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -302,7 +304,7 @@ def loading(seconds):
                     return
         pygame.display.update()
     pygame.quit()
-    
+
 
 def time_trial(game_args):
     input_field = TextField(
@@ -405,9 +407,18 @@ def time_trial(game_args):
 
 
 def save(game_args, name, result):
+    database = sqlite3.connect("scores.db")
+    cursor = database.cursor()
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+
+    cursor.execute(
+        f"""
+                   INSERT INTO scores (id, {name}, {result}, {date})
+                   """
+    )
+
     # save to csv
     file_name = f"{game_args['mode']}_no_{game_args['num_operations']}_nd_{game_args['num_digits']}"
-    date = datetime.datetime.now().strftime("%Y-%m-%d")
     if not os.path.exists("results"):
         os.makedirs("results")
     if not os.path.exists(
@@ -428,17 +439,22 @@ def save(game_args, name, result):
     with open(f"results/{file_name}.csv", "a") as f:
         f.write(f"{name},{result},{date}\n")
 
+    database.commit()
+    database.close()
+
 
 def read_results(game_args):
-    file_name = f"{game_args['mode']}_no_{game_args['num_operations']}_nd_{game_args['num_digits']}"
-    if not os.path.exists(f"results/{file_name}.csv"):
-        return []
-    with open(f"results/{file_name}.csv", "r") as f:
-        results = f.readlines()
-        results = [result.strip().split(",") for result in results]
-        results = sorted(results, key=lambda x: float(x[1]))
-
-    return results
+    database = sqlite3.connect("scores.db")
+    cursor = database.cursor()
+    category_id = functions.select_category_id(
+        cursor, game_args["mode"], game_args["num_digits"], game_args["num_operations"]
+    )
+    cursor.execute(f"SELECT * FROM score WHERE category_id = {category_id}")
+    results = cursor.fetchall()
+    to_show = [(result[1], result[2]) for result in results]
+    to_show_sorted = sorted(to_show, key=lambda x: x[1])[:10]
+    database.close()
+    return to_show_sorted
 
 
 def results(background_color, elapsed_time, game_args):
