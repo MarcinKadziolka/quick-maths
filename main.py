@@ -413,17 +413,18 @@ def save(game_args, username, result):
     category_id = functions.select_category_id(cursor, game_args)
     cursor.execute(
         f"""
-                   SELECT COUNT(1) FROM score WHERE name = '{username}' AND result = {result} AND date = '{date}' AND category_id = {category_id}
-                   """
+                   SELECT COUNT(1) FROM score WHERE name = ? AND result = ? AND date = ? AND category_id = ?
+                   """,
+        (username, result, date, category_id),
     )
     exists = cursor.fetchall()[0][0]
     if exists:
-        print("exists")
         return
     cursor.execute(
         f"""
-            INSERT INTO score (name, result, date, category_id) VALUES ('{username}', {result}, '{date}', {category_id})
-        """
+            INSERT INTO score (name, result, date, category_id) VALUES (?, ?, ?, ?)
+        """,
+        (username, result, date, category_id),
     )
     database.commit()
     database.close()
