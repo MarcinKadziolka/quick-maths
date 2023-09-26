@@ -9,7 +9,10 @@ def draw_text(text, x, y, screen, center=True, text_color=settings.colors.BLACK,
     screen.blit(text_obj, text_rect)
 
 
-def select_category_id(cursor, operation, digit, amount):
+def select_category_id(cursor, game_args):
+    operation = game_args["mode"]
+    digit = game_args["num_digits"]
+    amount = game_args["num_operations"]
     category_name = f"{operation}_digits_{digit}_amount_{amount}"
     cursor.execute(
         "SELECT category_id FROM category WHERE name=?",
