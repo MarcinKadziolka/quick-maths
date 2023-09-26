@@ -406,39 +406,25 @@ def time_trial(game_args):
         pygame.display.update()
 
 
-def save(game_args, name, result):
+def save(game_args, username, result):
     database = sqlite3.connect("scores.db")
     cursor = database.cursor()
     date = datetime.datetime.now().strftime("%Y-%m-%d")
-
+    category_id = functions.select_category_id(cursor, game_args)
     cursor.execute(
         f"""
-                   INSERT INTO scores (id, {name}, {result}, {date})
+                   SELECT COUNT(1) FROM score WHERE name = '{username}' AND result = {result} AND date = '{date}' AND category_id = {category_id}
                    """
     )
-
-    # save to csv
-    file_name = f"{game_args['mode']}_no_{game_args['num_operations']}_nd_{game_args['num_digits']}"
-    if not os.path.exists("results"):
-        os.makedirs("results")
-    if not os.path.exists(
-        f"results/{game_args['mode']}_{game_args['num_operations']}.csv"
-    ):
-        with open(
-            f"results/{game_args['mode']}_{game_args['num_operations']}.csv", "w"
-        ) as f:
-            f.write(f"{name},{result},{date}\n")
+    exists = cursor.fetchall()[0][0]
+    if exists:
+        print("exists")
         return
-    leaderboard = read_results(game_args)
-    # check if entry already exists
-    # if it does return
-    for _, entry in enumerate(leaderboard):
-        if entry[0] == name and entry[1] == result:
-            return
-
-    with open(f"results/{file_name}.csv", "a") as f:
-        f.write(f"{name},{result},{date}\n")
-
+    cursor.execute(
+        f"""
+            INSERT INTO score (name, result, date, category_id) VALUES ('{username}', {result}, '{date}', {category_id})
+        """
+    )
     database.commit()
     database.close()
 
@@ -446,9 +432,7 @@ def save(game_args, name, result):
 def read_results(game_args):
     database = sqlite3.connect("scores.db")
     cursor = database.cursor()
-    category_id = functions.select_category_id(
-        cursor, game_args["mode"], game_args["num_digits"], game_args["num_operations"]
-    )
+    category_id = functions.select_category_id(cursor, game_args)
     cursor.execute(f"SELECT * FROM score WHERE category_id = {category_id}")
     results = cursor.fetchall()
     to_show = [(result[1], result[2]) for result in results]
