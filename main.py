@@ -98,7 +98,7 @@ def time_trial_menu():
     checkboxes_x = settings.SCREEN_THIRDS[2]
     checkboxes_y = 200
     rounds_layout = CheckBoxLayout(
-        texts=["5", "10", "15", "20"],
+        texts=["5", "10", "15", "20", "∞"],
         active=1,
         height=50,
         width=50,
@@ -114,6 +114,16 @@ def time_trial_menu():
         width=50,
         x=checkboxes_x,
         y=checkboxes_y + settings.DISTANCE * 2,
+        distance=settings.DISTANCE,
+        orientation=Orientation.HORIZONTAL,
+    )
+    blind_layout = CheckBoxLayout(
+        texts=["off", "0.5", "1", "2"],
+        active=1,
+        height=50,
+        width=60,
+        x=checkboxes_x,
+        y=checkboxes_y + settings.DISTANCE * 4,
         distance=settings.DISTANCE,
         orientation=Orientation.HORIZONTAL,
     )
@@ -147,6 +157,7 @@ def time_trial_menu():
         (2, 1, pygame.K_DOWN): (3, 1),
         (2, 2, pygame.K_DOWN): (3, 2),
         (2, 3, pygame.K_DOWN): (3, 3),
+        (2, 4, pygame.K_DOWN): (3, 3),
     }
     d_navigation = defaultdict(tuple, nav)
     navigation = Navigation(
@@ -172,11 +183,20 @@ def time_trial_menu():
             screen=screen,
         )
 
+        functions.draw_text(
+            text="Blind mode",
+            font=settings.main_font_small,
+            x=checkboxes_x,
+            y=checkboxes_y + settings.DISTANCE * 3,
+            screen=screen,
+        )
+
         for event in pygame.event.get():
             navigation.update(event)
             digits_layout.update(event)
             options_layout.update(event)
             rounds_layout.update(event)
+            blind_layout.update(event)
             if start_button.check_action(event):
                 loading(seconds=3)
                 time_trial(game_args)
@@ -202,6 +222,7 @@ def time_trial_menu():
         digits_layout.display(screen)
         options_layout.display(screen)
         rounds_layout.display(screen)
+        blind_layout.display(screen)
         start_button.draw(screen)
 
         game_args["mode"] = options_layout.buttons[
