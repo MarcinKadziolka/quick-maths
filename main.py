@@ -119,7 +119,7 @@ def time_trial_menu():
     )
     blind_layout = CheckBoxLayout(
         texts=["off", "0.5", "1", "2"],
-        active=1,
+        active=0,
         height=50,
         width=60,
         x=checkboxes_x,
@@ -132,25 +132,37 @@ def time_trial_menu():
                     2 rounds_layout
     1 options_layout
                     3 digits_layout
+                    4 blind layout
     0 start_button
     """
-    # start_button nav
     nav = {
+        # start_button nav
         (0, 0, pygame.K_UP): (1, 2),
+        (0, 0, pygame.K_RIGHT): (4, 0),
         # options_layout nav
         (1, 0, pygame.K_RIGHT): (2, 0),
         (1, 2, pygame.K_RIGHT): (3, 0),
         (1, 2, pygame.K_DOWN): (0, 0),
         # digits_layout nav
         (3, 0, pygame.K_LEFT): (1, 2),
-        (3, 0, pygame.K_DOWN): (0, 0),
-        (3, 1, pygame.K_DOWN): (0, 0),
-        (3, 2, pygame.K_DOWN): (0, 0),
-        (3, 3, pygame.K_DOWN): (0, 0),
+        (3, 0, pygame.K_DOWN): (4, 0),
+        (3, 1, pygame.K_DOWN): (4, 1),
+        (3, 2, pygame.K_DOWN): (4, 2),
+        (3, 3, pygame.K_DOWN): (4, 3),
         (3, 0, pygame.K_UP): (2, 0),
         (3, 1, pygame.K_UP): (2, 1),
         (3, 2, pygame.K_UP): (2, 2),
         (3, 3, pygame.K_UP): (2, 3),
+        # blind_layout nav
+        (4, 0, pygame.K_DOWN): (0, 0),
+        (4, 1, pygame.K_DOWN): (0, 0),
+        (4, 2, pygame.K_DOWN): (0, 0),
+        (4, 3, pygame.K_DOWN): (0, 0),
+        (4, 0, pygame.K_UP): (3, 0),
+        (4, 1, pygame.K_UP): (3, 1),
+        (4, 2, pygame.K_UP): (3, 2),
+        (4, 3, pygame.K_UP): (3, 3),
+        (4, 0, pygame.K_LEFT): (0, 0),
         # rounds_layout nav
         (2, 0, pygame.K_LEFT): (1, 0),
         (2, 0, pygame.K_DOWN): (3, 0),
@@ -161,7 +173,7 @@ def time_trial_menu():
     }
     d_navigation = defaultdict(tuple, nav)
     navigation = Navigation(
-        [button_layout, options_layout, rounds_layout, digits_layout],
+        [button_layout, options_layout, rounds_layout, digits_layout, blind_layout],
         navigation=d_navigation,
     )
     game_args = {}
@@ -234,6 +246,8 @@ def time_trial_menu():
         game_args["num_digits"] = int(
             digits_layout.buttons[digits_layout.active_id].text
         )
+        game_args["blind"] = blind_layout.buttons[blind_layout.active_id].text
+        
         show_leaderboard(
             game_args=game_args, screen=screen, x=settings.SCREEN_THIRDS[0], y=150
         )
@@ -351,6 +365,11 @@ def time_trial(game_args):
     )
     run = True
     n = game_args["num_operations"]
+    blind_time = game_args["blind"]
+    if blind_time == "off":
+        blind_time = 999
+    else:
+        blind_time = float(blind_time)
 
     equations = iter(get_all_equations(game_args["mode"], n, game_args["num_digits"]))
     current_equation = next(equations)
@@ -364,6 +383,7 @@ def time_trial(game_args):
     current_equation_index = 1
 
     answer_button.current = True
+    blind_timer = time.time()
     while run:
         elapsed_time = f"{time.time() - start:.2f}"
         screen.fill(background_color)
@@ -385,6 +405,7 @@ def time_trial(game_args):
                     background_color[2] = max(background_color[2] - green_step, 0)
                     current_equation_index += 1
                     try:
+                        blind_timer = time.time()
                         current_equation = next(equations)
                     except StopIteration as _:
                         run = results(background_color, elapsed_time, game_args)
@@ -403,20 +424,22 @@ def time_trial(game_args):
 
         input_field.update(screen)
         answer_button.draw(screen)
-
+    
         functions.draw_text(
             text=f"{current_equation_index}/{num_equations}",
             x=settings.SCREEN_THIRDS[2],
             y=70,
             screen=screen,
         )
-        functions.draw_text(
-            text=f"{current_equation[0]} {current_equation[3]} {current_equation[1]}",
-            font=settings.equation_font_small,
-            x=settings.MID_WIDTH,
-            y=settings.SCREEN_HEIGHT - 500,
-            screen=screen,
-        )
+        
+        if time.time() - blind_timer < blind_time:
+            functions.draw_text(
+                text=f"{current_equation[0]} {current_equation[3]} {current_equation[1]}",
+                font=settings.equation_font_small,
+                x=settings.MID_WIDTH,
+                y=settings.SCREEN_HEIGHT - 500,
+                screen=screen,
+            )
         functions.draw_text(
             elapsed_time,
             x=settings.SCREEN_THIRDS[0],
