@@ -1,7 +1,15 @@
 import settings
 
 
-def draw_text(text, x, y, screen, center=True, text_color=settings.colors.BLACK, font=settings.main_font_small):
+def draw_text(
+    text,
+    x,
+    y,
+    screen,
+    center=True,
+    text_color=settings.colors.BLACK,
+    font=settings.main_font_small,
+):
     text_obj = font.render(str(text), font, text_color)
     text_rect = text_obj.get_rect(topleft=(x, y))
     if center:
