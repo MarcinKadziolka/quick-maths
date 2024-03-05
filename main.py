@@ -12,14 +12,13 @@ from classes import (
 import random
 import time
 import datetime
-import os
 from collections import defaultdict
 import sqlite3
 
 pygame.init()
 
 
-screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
+screen = pygame.display.set_mode((settings.SCREEN_SIZE.x, settings.SCREEN_SIZE.y))
 pygame.display.set_caption("Quick Maths")
 
 
@@ -30,7 +29,7 @@ def main_menu():
         text="Time trial",
         width=400,
         height=50,
-        x=settings.MID_WIDTH,
+        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y,
         active=True,
     )
@@ -39,7 +38,7 @@ def main_menu():
         text="Countdown",
         width=400,
         height=50,
-        x=settings.MID_WIDTH,
+        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y + settings.DISTANCE,
         active=True,
     )
@@ -50,7 +49,7 @@ def main_menu():
         functions.draw_text(
             text="QuickMaths",
             font=settings.main_font,
-            x=settings.MID_WIDTH,
+            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -79,7 +78,7 @@ def time_trial_menu():
         text="Start",
         width=400,
         height=50,
-        x=settings.MID_WIDTH,
+        x=settings.SCREEN_SIZE.mid_x,
         y=600,
         active=True,
     )
@@ -89,13 +88,13 @@ def time_trial_menu():
         active=0,
         height=50,
         width=400,
-        x=settings.MID_WIDTH,
+        x=settings.SCREEN_SIZE.mid_x,
         y=200,
         center=False,
         distance=settings.DISTANCE,
     )
 
-    checkboxes_x = settings.SCREEN_THIRDS[2]
+    checkboxes_x = settings.SCREEN_SIZE.right_third
     checkboxes_y = 200
     rounds_layout = CheckBoxLayout(
         texts=["5", "10", "15", "20", "∞"],
@@ -182,7 +181,7 @@ def time_trial_menu():
         functions.draw_text(
             text="Time trial",
             font=settings.main_font,
-            x=settings.MID_WIDTH,
+            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -190,7 +189,7 @@ def time_trial_menu():
         functions.draw_text(
             text="Leaderboard",
             font=settings.main_font_small,
-            x=settings.SCREEN_THIRDS[0],
+            x=settings.SCREEN_SIZE.left_third,
             y=80,
             screen=screen,
         )
@@ -247,9 +246,9 @@ def time_trial_menu():
             digits_layout.buttons[digits_layout.active_id].text
         )
         game_args["blind"] = blind_layout.buttons[blind_layout.active_id].text
-        
+
         show_leaderboard(
-            game_args=game_args, screen=screen, x=settings.SCREEN_THIRDS[0], y=150
+            game_args=game_args, screen=screen, x=settings.SCREEN_SIZE.left_third, y=150
         )
         pygame.display.update()
 
@@ -269,12 +268,14 @@ def show_leaderboard(game_args, screen, x, y):
 
 def get_equation(operator, digits):
     if operator == "*" and digits == 1:
+        # don't multiply by one
         random_digits = "".join([str(random.randint(2, 9)) for _ in range(2 * digits)])
     else:
         random_digits = "".join([str(random.randint(1, 9)) for _ in range(2 * digits)])
+
     x = int(random_digits[:digits])
     y = int(random_digits[digits:])
-
+    result = None
     if operator == "+":
         result = x + y
     elif operator == "-":
@@ -321,8 +322,8 @@ def loading(seconds):
         functions.draw_text(
             text=counter,
             font=settings.main_font,
-            x=settings.MID_WIDTH,
-            y=settings.SCREEN_HEIGHT - 500,
+            x=settings.SCREEN_SIZE.mid_x,
+            y=settings.SCREEN_SIZE.y - 500,
             screen=screen,
             center=True,
         )
@@ -349,8 +350,8 @@ def time_trial(game_args):
         text_color=settings.colors.BLACK,
         active_color=settings.colors.WHITE,
         inactive_color=settings.colors.BLACK,
-        x=settings.MID_WIDTH,
-        y=settings.SCREEN_HEIGHT - 300,
+        x=settings.SCREEN_SIZE.mid_x,
+        y=settings.SCREEN_SIZE.y - 300,
         prompt_text="",
         numeric_only=True,
     )
@@ -359,8 +360,8 @@ def time_trial(game_args):
         text="Answer",
         width=400,
         height=50,
-        x=settings.MID_WIDTH,
-        y=settings.SCREEN_HEIGHT - 200,
+        x=settings.SCREEN_SIZE.mid_x,
+        y=settings.SCREEN_SIZE.y - 200,
         active=True,
     )
     run = True
@@ -390,7 +391,7 @@ def time_trial(game_args):
         functions.draw_text(
             text="Time trial",
             font=settings.main_font,
-            x=settings.MID_WIDTH,
+            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -424,25 +425,25 @@ def time_trial(game_args):
 
         input_field.update(screen)
         answer_button.draw(screen)
-    
+
         functions.draw_text(
             text=f"{current_equation_index}/{num_equations}",
-            x=settings.SCREEN_THIRDS[2],
+            x=settings.SCREEN_SIZE.right_third,
             y=70,
             screen=screen,
         )
-        
+
         if time.time() - blind_timer < blind_time:
             functions.draw_text(
                 text=f"{current_equation[0]} {current_equation[3]} {current_equation[1]}",
                 font=settings.equation_font_small,
-                x=settings.MID_WIDTH,
-                y=settings.SCREEN_HEIGHT - 500,
+                x=settings.SCREEN_SIZE.mid_x,
+                y=settings.SCREEN_SIZE.y - 500,
                 screen=screen,
             )
         functions.draw_text(
             elapsed_time,
-            x=settings.SCREEN_THIRDS[0],
+            x=settings.SCREEN_SIZE.left_third,
             y=70,
             screen=screen,
         )
@@ -489,7 +490,7 @@ def read_results(game_args):
 def results(background_color, elapsed_time, game_args):
     run = True
 
-    first_button_y = settings.SCREEN_HEIGHT - 300
+    first_button_y = settings.SCREEN_SIZE.y - 300
     input_field = TextField(
         font=settings.main_font_small,
         width=400,
@@ -497,7 +498,7 @@ def results(background_color, elapsed_time, game_args):
         text_color=settings.colors.BLACK,
         active_color=settings.colors.WHITE,
         inactive_color=settings.colors.BLACK,
-        x=settings.MID_WIDTH,
+        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y,
         prompt_text="",
     )
@@ -505,7 +506,7 @@ def results(background_color, elapsed_time, game_args):
         text="Save result",
         width=400,
         height=50,
-        x=settings.MID_WIDTH,
+        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y + settings.DISTANCE,
         active=True,
     )
@@ -513,7 +514,7 @@ def results(background_color, elapsed_time, game_args):
         text="Try again",
         width=400,
         height=50,
-        x=settings.MID_WIDTH,
+        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y + settings.DISTANCE * 2,
         active=True,
     )
@@ -524,7 +525,7 @@ def results(background_color, elapsed_time, game_args):
         functions.draw_text(
             text=elapsed_time,
             font=settings.main_font,
-            x=settings.MID_WIDTH,
+            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -547,13 +548,13 @@ def results(background_color, elapsed_time, game_args):
         functions.draw_text(
             text="Leaderboard",
             font=settings.main_font_small,
-            x=settings.SCREEN_THIRDS[0],
+            x=settings.SCREEN_SIZE.left_third,
             y=80,
             screen=screen,
         )
 
         show_leaderboard(
-            game_args=game_args, screen=screen, x=settings.SCREEN_THIRDS[0], y=150
+            game_args=game_args, screen=screen, x=settings.SCREEN_SIZE.left_third, y=150
         )
 
         try_again_button.draw(screen)
@@ -570,8 +571,8 @@ def countdown_menu():
         active=2,
         height=80,
         width=80,
-        x=settings.MID_WIDTH,
-        y=settings.MID_HEIGHT,
+        x=settings.SCREEN_SIZE.mid_x,
+        y=settings.SCREEN_SIZE.mid_y,
         distance=100,
         orientation=Orientation.HORIZONTAL,
     )
@@ -580,8 +581,8 @@ def countdown_menu():
         "Start",
         width=400,
         height=50,
-        x=settings.MID_WIDTH,
-        y=settings.MID_HEIGHT + 200,
+        x=settings.SCREEN_SIZE.mid_x,
+        y=settings.SCREEN_SIZE.mid_y + 200,
         active=True,
     )
     start_layout = ButtonLayout([start_button])
@@ -606,14 +607,14 @@ def countdown_menu():
         functions.draw_text(
             text="Countdown",
             font=settings.main_font,
-            x=settings.MID_WIDTH,
+            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
 
         functions.draw_text(
             text="How many big numbers?",
-            x=settings.MID_WIDTH,
+            x=settings.SCREEN_SIZE.mid_x,
             y=170,
             screen=screen,
         )
@@ -650,8 +651,8 @@ def countdown(n_big):
         active=-1,
         height=80,
         width=80,
-        x=settings.MID_WIDTH,
-        y=settings.MID_HEIGHT,
+        x=settings.SCREEN_SIZE.mid_x,
+        y=settings.SCREEN_SIZE.mid_y,
         distance=100,
         orientation=Orientation.HORIZONTAL,
         inactive_color=settings.colors.WHITE,
@@ -661,8 +662,8 @@ def countdown(n_big):
         text="Next",
         width=400,
         height=50,
-        x=settings.MID_WIDTH,
-        y=settings.MID_HEIGHT + 200,
+        x=settings.SCREEN_SIZE.mid_x,
+        y=settings.SCREEN_SIZE.mid_y + 200,
         active=True,
     )
 
@@ -677,7 +678,7 @@ def countdown(n_big):
         functions.draw_text(
             text="Countdown",
             font=settings.main_font,
-            x=settings.MID_WIDTH,
+            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -685,8 +686,8 @@ def countdown(n_big):
         functions.draw_text(
             text=target,
             font=settings.main_font,
-            x=settings.MID_WIDTH,
-            y=settings.MID_HEIGHT - 100,
+            x=settings.SCREEN_SIZE.mid_x,
+            y=settings.SCREEN_SIZE.mid_y - 100,
             screen=screen,
         )
 
