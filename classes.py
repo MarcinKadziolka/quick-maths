@@ -61,11 +61,11 @@ class Button:
         self.color_to_display = (
             self.active_and_current_color
             if (self.active and self.current)
-            else self.current_color
-            if self.current
-            else self.active_color
-            if self.active
-            else self.inactive_color
+            else (
+                self.current_color
+                if self.current
+                else self.active_color if self.active else self.inactive_color
+            )
         )
 
     def draw_down(self, screen):
@@ -175,7 +175,7 @@ class ButtonLayout:
 
 
 class Navigation:
-    def __init__(self, layouts, navigation=defaultdict(lambda: None)):
+    def __init__(self, layouts, navigation: defaultdict = defaultdict(tuple, {})):
         self.layout_id = 0
         self.button_id = 0
         self.layouts = layouts
