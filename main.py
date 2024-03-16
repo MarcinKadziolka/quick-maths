@@ -11,12 +11,13 @@ from classes import (
 )
 import random
 import time
-import datetime
 from collections import defaultdict
-import sqlite3
+import os
+
+position = 0, 0
+os.environ["SDL_VIDEO_WINDOW_POS"] = str(position[0]) + "," + str(position[1])
 
 pygame.init()
-
 
 screen = pygame.display.set_mode((settings.SCREEN_SIZE.x, settings.SCREEN_SIZE.y))
 pygame.display.set_caption("Quick Maths")
@@ -247,23 +248,10 @@ def time_trial_menu():
         )
         game_args["blind"] = blind_layout.buttons[blind_layout.active_id].text
 
-        show_leaderboard(
+        functions.show_leaderboard(
             game_args=game_args, screen=screen, x=settings.SCREEN_SIZE.left_third, y=150
         )
         pygame.display.update()
-
-
-def show_leaderboard(game_args, screen, x, y):
-    leaderboard = read_results(game_args)
-    show_leaderboard = min(10, len(leaderboard))
-
-    for i in range(show_leaderboard):
-        functions.draw_text(
-            text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
-            x=x,
-            y=y + i * 50,
-            screen=screen,
-        )
 
 
 def get_equation(operator, digits):
@@ -451,42 +439,6 @@ def time_trial(game_args):
         pygame.display.update()
 
 
-def save(game_args, username, result):
-    database = sqlite3.connect("scores.db")
-    cursor = database.cursor()
-    date = datetime.datetime.now().strftime("%Y-%m-%d")
-    category_id = functions.select_category_id(cursor, game_args)
-    cursor.execute(
-        f"""
-                   SELECT COUNT(1) FROM score WHERE name = ? AND result = ? AND date = ? AND category_id = ?
-                   """,
-        (username, result, date, category_id),
-    )
-    exists = cursor.fetchall()[0][0]
-    if exists:
-        return
-    cursor.execute(
-        f"""
-            INSERT INTO score (name, result, date, category_id) VALUES (?, ?, ?, ?)
-        """,
-        (username, result, date, category_id),
-    )
-    database.commit()
-    database.close()
-
-
-def read_results(game_args):
-    database = sqlite3.connect("scores.db")
-    cursor = database.cursor()
-    category_id = functions.select_category_id(cursor, game_args)
-    cursor.execute(f"SELECT * FROM score WHERE category_id = {category_id}")
-    results = cursor.fetchall()
-    to_show = [(result[1], result[2]) for result in results]
-    to_show_sorted = sorted(to_show, key=lambda x: x[1])[:10]
-    database.close()
-    return to_show_sorted
-
-
 def results(background_color, elapsed_time, game_args):
     run = True
 
@@ -533,7 +485,7 @@ def results(background_color, elapsed_time, game_args):
             navigation.update(event)
             input_field.get_event(event)
             if save_button.check_action(event):
-                save(game_args, input_field.user_input, elapsed_time)
+                functions.save(game_args, input_field.user_input, elapsed_time)
                 save_button.active = False
             if try_again_button.check_action(event):
                 return False
@@ -553,7 +505,7 @@ def results(background_color, elapsed_time, game_args):
             screen=screen,
         )
 
-        show_leaderboard(
+        functions.show_leaderboard(
             game_args=game_args, screen=screen, x=settings.SCREEN_SIZE.left_third, y=150
         )
 

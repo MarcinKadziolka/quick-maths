@@ -1,3 +1,6 @@
+import datetime
+import sqlite3
+
 import settings
 
 
@@ -10,13 +13,14 @@ def draw_text(
     text_color=settings.colors.BLACK,
     font=settings.main_font_small,
 ):
-    text_obj = font.render(str(text), font, text_color)
+    text_obj = font.render(str(text), True, text_color)
     text_rect = text_obj.get_rect(topleft=(x, y))
     if center:
         text_rect.center = x, y
     screen.blit(text_obj, text_rect)
 
 
+# TODO: test function
 def select_category_id(cursor, game_args):
     operation = game_args["mode"]
     digit = game_args["num_digits"]
@@ -27,3 +31,52 @@ def select_category_id(cursor, game_args):
         (category_name,),
     )
     return cursor.fetchone()[0]
+
+
+def save(game_args, username, result):
+    database = sqlite3.connect("scores.db")
+    cursor = database.cursor()
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+    category_id = select_category_id(cursor, game_args)
+    cursor.execute(
+        """
+                   SELECT COUNT(1) FROM score WHERE name = ? AND result = ? AND date = ? AND category_id = ?
+                   """,
+        (username, result, date, category_id),
+    )
+    exists = cursor.fetchall()[0][0]
+    if exists:
+        return
+    cursor.execute(
+        """
+            INSERT INTO score (name, result, date, category_id) VALUES (?, ?, ?, ?)
+        """,
+        (username, result, date, category_id),
+    )
+    database.commit()
+    database.close()
+
+
+def read_results(game_args):
+    database = sqlite3.connect("scores.db")
+    cursor = database.cursor()
+    category_id = select_category_id(cursor, game_args)
+    cursor.execute(f"SELECT * FROM score WHERE category_id = {category_id}")
+    results = cursor.fetchall()
+    to_show = [(result[1], result[2]) for result in results]
+    to_show_sorted = sorted(to_show, key=lambda x: x[1])[:10]
+    database.close()
+    return to_show_sorted
+
+
+def show_leaderboard(game_args, screen, x, y):
+    leaderboard = read_results(game_args)
+    show_leaderboard = min(10, len(leaderboard))
+
+    for i in range(show_leaderboard):
+        draw_text(
+            text=f"{i+1}. {leaderboard[i][0]} {leaderboard[i][1]}",
+            x=x,
+            y=y + i * 50,
+            screen=screen,
+        )
