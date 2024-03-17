@@ -1,7 +1,87 @@
 import datetime
 import sqlite3
-
 import settings
+
+
+def prepare_database(filename):
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute(
+        """
+        CREATE TABLE "amount" (
+	        "amount_id" INTEGER,
+	        "num_amount" INTEGER,
+	        PRIMARY KEY("amount_id")
+        )"""
+    )
+
+    cursor.execute(
+        """
+        CREATE TABLE "category" (
+            "category_id" INTEGER,
+            "name" TEXT,
+            "amount_id" INTEGER,
+            PRIMARY KEY("category_id"),
+            FOREIGN KEY("amount_id") REFERENCES "amount"("amount_id")
+        )
+        """
+    )
+    cursor.execute(
+        """ 
+        CREATE TABLE "digit" (
+            "digit_id" INTEGER,
+            "num_digit" INTEGER,
+            PRIMARY KEY("digit_id")
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE "category_digit" (
+            "category_id" INTEGER,
+            "digit_id" INTEGER,
+            FOREIGN KEY("category_id") REFERENCES "category"("category_id"),
+            FOREIGN KEY("digit_id") REFERENCES "digit"("digit_id")
+        )
+        """
+    )
+
+    cursor.execute(
+        """ 
+        CREATE TABLE "operation" (
+            "operation_id" INTEGER,
+            "name" TEXT,
+            PRIMARY KEY("operation_id")
+        )
+        """
+    )
+
+    cursor.execute(
+        """ 
+        CREATE TABLE "category_operation" (
+            "category_id" INTEGER,
+            "operation_id" INTEGER,
+            FOREIGN KEY("category_id") REFERENCES "category"("category_id"),
+            FOREIGN KEY("operation_id") REFERENCES "operation"("operation_id")
+        )
+        """
+    )
+
+    cursor.execute(
+        """
+        CREATE TABLE "score" (
+            "score_id" INTEGER,
+            "name" STRING,
+            "result" DOUBLE,
+            "date" DATE,
+            "category_id" INTEGER,
+            PRIMARY KEY("score_id")
+        )
+        """
+    )
+    # TODO: add blind time table
+    connection.commit()
+    connection.close()
 
 
 def draw_text(
