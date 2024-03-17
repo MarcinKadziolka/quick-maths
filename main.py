@@ -14,12 +14,9 @@ import time
 from collections import defaultdict
 import os
 
-position = 0, 0
-os.environ["SDL_VIDEO_WINDOW_POS"] = str(position[0]) + "," + str(position[1])
-
+os.environ["SDL_VIDEO_CENTERED"] = "1"
 pygame.init()
-
-screen = pygame.display.set_mode((settings.SCREEN_SIZE.x, settings.SCREEN_SIZE.y))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption("Quick Maths")
 
 
@@ -240,6 +237,8 @@ def time_trial_menu():
         game_args["mode"] = options_layout.buttons[
             options_layout.active_id
         ].text.lower()
+        # TODO: fix game operations for infinity
+        # right now it tries to convert character of infinity to int
         game_args["num_operations"] = int(
             rounds_layout.buttons[rounds_layout.active_id].text
         )
