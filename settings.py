@@ -30,7 +30,8 @@ class ScreenSize:
         return self.x * 5 / 6
 
 
-SCREEN_SIZE = ScreenSize(1280, 650)
+infoObject = pygame.display.Info()
+SCREEN_SIZE = ScreenSize(infoObject.current_w, infoObject.current_h)
 
 DISTANCE = 80
 SLEEP_DURATION = 0.1
