@@ -1,9 +1,13 @@
 import datetime
 import sqlite3
 import settings
+import random
+import pygame
+
+operation_to_operator = {"addition": "+", "subtraction": "-", "multiplication": "*"}
 
 
-def prepare_database(filename):
+def prepare_database(filename: str):
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
     cursor.execute(
@@ -86,12 +90,12 @@ def prepare_database(filename):
 
 def draw_text(
     text,
-    x,
-    y,
-    screen,
-    center=True,
-    text_color=settings.colors.BLACK,
-    font=settings.main_font_small,
+    x: int,
+    y: int,
+    screen: pygame.Surface,
+    center: bool = True,
+    text_color: list[int] = settings.colors.BLACK,
+    font: pygame.font.FontType = settings.main_font_small,
 ):
     text_obj = font.render(str(text), True, text_color)
     text_rect = text_obj.get_rect(topleft=(x, y))
@@ -101,7 +105,7 @@ def draw_text(
 
 
 # TODO: test function
-def select_category_id(cursor, game_args):
+def select_category_id(cursor: sqlite3.Cursor, game_args: dict):
     operation = game_args["mode"]
     digit = game_args["num_digits"]
     amount = game_args["num_operations"]
@@ -113,7 +117,7 @@ def select_category_id(cursor, game_args):
     return cursor.fetchone()[0]
 
 
-def save(game_args, username, result):
+def save(game_args: dict, username: str, result: float):
     database = sqlite3.connect("scores.db")
     cursor = database.cursor()
     date = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -137,7 +141,7 @@ def save(game_args, username, result):
     database.close()
 
 
-def read_results(game_args):
+def read_results(game_args: dict):
     database = sqlite3.connect("scores.db")
     cursor = database.cursor()
     category_id = select_category_id(cursor, game_args)
@@ -149,7 +153,7 @@ def read_results(game_args):
     return to_show_sorted
 
 
-def show_leaderboard(game_args, screen, x, y):
+def show_leaderboard(game_args: dict, screen, x: int, y: int):
     leaderboard = read_results(game_args)
     show_leaderboard = min(10, len(leaderboard))
 
@@ -160,3 +164,37 @@ def show_leaderboard(game_args, screen, x, y):
             y=y + i * 50,
             screen=screen,
         )
+
+
+def get_equation(operator, digits: int) -> tuple[int, int, int, str]:
+    if operator == "*" and digits == 1:
+        # don't multiply by one
+        random_digits = "".join([str(random.randint(2, 9)) for _ in range(2 * digits)])
+    else:
+        random_digits = "".join([str(random.randint(1, 9)) for _ in range(2 * digits)])
+
+    x = int(random_digits[:digits])
+    y = int(random_digits[digits:])
+    result = 0
+    if operator == "+":
+        result = x + y
+    elif operator == "-":
+        result = abs(x - y)
+    elif operator == "*":
+        result = x * y
+    return x, y, result, operator
+
+
+def get_all_equations(operator, n: int, digits: int) -> list[tuple]:
+    return [get_equation(operator, digits) for _ in range(n)]
+
+
+# TODO: validate answer
+def check_equation(answer: str, result: int) -> bool:
+    if answer == "":
+        return False
+    try:
+        integer_answer = int(answer)
+    except ValueError as _:
+        return False
+    return integer_answer == result
