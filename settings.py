@@ -10,24 +10,24 @@ class ScreenSize:
     y: int
 
     @property
-    def mid_x(self) -> float:
-        return self.x / 2
+    def mid_x(self) -> int:
+        return int(self.x / 2)
 
     @property
-    def mid_y(self) -> float:
-        return self.y / 2
+    def mid_y(self) -> int:
+        return int(self.y / 2)
 
     @property
-    def left_third(self) -> float:
-        return self.x / 6
+    def left_third(self) -> int:
+        return int(self.x / 6)
 
     @property
-    def middle_third(self) -> float:
-        return self.x / 2
+    def middle_third(self) -> int:
+        return int(self.x / 2)
 
     @property
-    def right_third(self) -> float:
-        return self.x * 5 / 6
+    def right_third(self) -> int:
+        return int(self.x * 5 / 6)
 
 
 infoObject = pygame.display.Info()
