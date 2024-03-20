@@ -14,12 +14,12 @@ class Button:
         x,
         y,
         font=settings.main_font_small,
-        text_color=settings.colors.BLACK,
-        color=settings.colors.WHITE,
-        shadow_color=settings.colors.BLACK,
-        inactive_color=settings.colors.GRAY,
-        current_color=settings.colors.GREEN,
-        active_and_current_color=settings.colors.LIGHT_GREEN,
+        text_color=settings.Color.BLACK.value,
+        color=settings.Color.WHITE.value,
+        shadow_color=settings.Color.BLACK.value,
+        inactive_color=settings.Color.GRAY.value,
+        current_color=settings.Color.GREEN.value,
+        active_and_current_color=settings.Color.LIGHT_GREEN.value,
         active=False,
         on_hover=True,
     ):
@@ -215,7 +215,7 @@ class CheckBoxLayout:
         distance,
         center=True,
         orientation=Orientation.VERTICAL,
-        inactive_color=settings.colors.GRAY,
+        inactive_color=settings.Color.GRAY.value,
     ) -> None:
         self.num_buttons = len(texts)
         self.buttons = []

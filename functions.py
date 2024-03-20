@@ -96,10 +96,14 @@ def draw_text(
     screen: pygame.Surface,
     center: bool = True,
 <<<<<<< HEAD
+<<<<<<< HEAD
     text_color: list[int] = settings.colors.BLACK,
 =======
     text_color: tuple[int, int, int] = typing.get_args(settings.Color.BLACK.value),
 >>>>>>> 66847b9 (Fix type hinting)
+=======
+    text_color: list[int] = settings.Color.BLACK.value,
+>>>>>>> e980306 (Fix extracting value from Color Enum class)
     font: pygame.font.FontType = settings.main_font_small,
 ):
     text_obj = font.render(str(text), True, text_color)
