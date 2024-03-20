@@ -4,7 +4,6 @@ import settings
 import random
 import pygame
 import typing
-from typing import Literal
 
 operation_to_operator = {"addition": "+", "subtraction": "-", "multiplication": "*"}
 
