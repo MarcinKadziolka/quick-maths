@@ -234,9 +234,9 @@ def time_trial_menu():
         blind_layout.display(screen)
         start_button.draw(screen)
 
-        game_args["mode"] = options_layout.buttons[
-            options_layout.active_id
-        ].text.lower()
+        operation_str = options_layout.buttons[options_layout.active_id].text.lower()
+        game_args["mode"] = operation_str
+
         # TODO: fix game operations for infinity
         # right now it tries to convert character of infinity to int
         game_args["num_operations"] = int(
@@ -251,50 +251,6 @@ def time_trial_menu():
             game_args=game_args, screen=screen, x=settings.SCREEN_SIZE.left_third, y=150
         )
         pygame.display.update()
-
-
-def get_equation(operator, digits):
-    if operator == "*" and digits == 1:
-        # don't multiply by one
-        random_digits = "".join([str(random.randint(2, 9)) for _ in range(2 * digits)])
-    else:
-        random_digits = "".join([str(random.randint(1, 9)) for _ in range(2 * digits)])
-
-    x = int(random_digits[:digits])
-    y = int(random_digits[digits:])
-    result = None
-    if operator == "+":
-        result = x + y
-    elif operator == "-":
-        result = abs(x - y)
-    elif operator == "*":
-        result = x * y
-    return x, y, result, operator
-
-
-def get_all_equations(mode, n, digits):
-    all_equations = []
-    if mode == "addition":
-        for _ in range(n):
-            all_equations.append(get_equation("+", digits))
-    elif mode == "subtraction":
-        for _ in range(n):
-            all_equations.append(get_equation("-", digits))
-    elif mode == "multiplication":
-        for _ in range(n):
-            all_equations.append(get_equation("*", digits))
-
-    return all_equations
-
-
-def check_equation(answer, result):
-    if answer == "":
-        return
-    try:
-        integer_answer = int(answer)
-    except ValueError as _:
-        return False
-    return integer_answer == result
 
 
 def loading(seconds):
@@ -353,14 +309,18 @@ def time_trial(game_args):
     )
     run = True
     n = game_args["num_operations"]
+    operator = functions.operation_to_operator[game_args["mode"]]
+    num_digits = game_args["num_digits"]
     blind_time = game_args["blind"]
+
     if blind_time == "off":
         blind_time = 999
     else:
         blind_time = float(blind_time)
 
-    equations = iter(get_all_equations(game_args["mode"], n, game_args["num_digits"]))
+    equations = iter(functions.get_all_equations(operator, n, num_digits))
     current_equation = next(equations)
+    # TODO: maybe named tuple for background color and RGB
     background_color = list(settings.colors.BACKGROUND)
     red_step = int((background_color[0]) / n)
     green_step = int((255 - background_color[1]) / n)
@@ -387,7 +347,9 @@ def time_trial(game_args):
             if answer_button.check_action(event):
                 if input_field.user_input == "":
                     pass
-                elif check_equation(input_field.user_input, current_equation[2]):
+                elif functions.check_equation(
+                    input_field.user_input, current_equation[2]
+                ):
                     background_color[0] = max(background_color[0] - green_step, 0)
                     background_color[1] = min(background_color[1] + green_step, 255)
                     background_color[2] = max(background_color[2] - green_step, 0)
@@ -503,7 +465,6 @@ def results(background_color, elapsed_time, game_args):
             y=80,
             screen=screen,
         )
-
         functions.show_leaderboard(
             game_args=game_args, screen=screen, x=settings.SCREEN_SIZE.left_third, y=150
         )
