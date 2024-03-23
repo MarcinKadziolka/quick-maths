@@ -13,6 +13,7 @@ import random
 import time
 from collections import defaultdict
 import os
+from copy import copy
 
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 pygame.init()
@@ -321,8 +322,8 @@ def time_trial(game_args):
 
     equations = iter(functions.get_all_equations(operator, n, num_digits))
     current_equation = next(equations)
+    background_color = copy(settings.Color.BACKGROUND.value)
     # TODO: maybe named tuple for background color and RGB
-    background_color = settings.Color.BACKGROUND.value
     red_step = int((background_color[0]) / n)
     green_step = int((255 - background_color[1]) / n)
 
