@@ -13,7 +13,6 @@ import random
 import time
 from collections import defaultdict
 import os
-from typing import get_args
 
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 pygame.init()
@@ -238,19 +237,20 @@ def time_trial_menu():
         operation_str = options_layout.buttons[options_layout.active_id].text.lower()
         game_args["mode"] = operation_str
 
-        # TODO: fix game operations for infinity
-        # right now it tries to convert character of infinity to int
-        game_args["num_operations"] = int(
-            rounds_layout.buttons[rounds_layout.active_id].text
-        )
+        game_args["num_operations"] = functions.digit_id_to_num[rounds_layout.active_id]
+
         game_args["num_digits"] = int(
             digits_layout.buttons[digits_layout.active_id].text
         )
         game_args["blind"] = blind_layout.buttons[blind_layout.active_id].text
 
-        functions.show_leaderboard(
-            game_args=game_args, screen=screen, x=settings.SCREEN_SIZE.left_third, y=150
-        )
+        if rounds_layout.active_id != 4:  # if not infinity
+            functions.show_leaderboard(
+                game_args=game_args,
+                screen=screen,
+                x=settings.SCREEN_SIZE.left_third,
+                y=150,
+            )
         pygame.display.update()
 
 
@@ -315,14 +315,14 @@ def time_trial(game_args):
     blind_time = game_args["blind"]
 
     if blind_time == "off":
-        blind_time = 999
+        blind_time = 99999
     else:
         blind_time = float(blind_time)
 
     equations = iter(functions.get_all_equations(operator, n, num_digits))
     current_equation = next(equations)
     # TODO: maybe named tuple for background color and RGB
-    background_color = list(get_args(settings.Color.BACKGROUND))
+    background_color = settings.Color.BACKGROUND.value
     red_step = int((background_color[0]) / n)
     green_step = int((255 - background_color[1]) / n)
 
@@ -392,10 +392,11 @@ def time_trial(game_args):
                 screen=screen,
             )
         functions.draw_text(
-            elapsed_time,
-            x=settings.SCREEN_SIZE.left_third,
-            y=70,
+            text=elapsed_time,
+            x=settings.SCREEN_SIZE.left_third - 20,
+            y=70 - 20,
             screen=screen,
+            center=False,
         )
 
         pygame.display.update()

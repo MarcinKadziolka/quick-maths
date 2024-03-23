@@ -3,9 +3,9 @@ import sqlite3
 import settings
 import random
 import pygame
-import typing
 
 operation_to_operator = {"addition": "+", "subtraction": "-", "multiplication": "*"}
+digit_id_to_num = {0: 5, 1: 10, 2: 15, 3: 20, 4: 99999}
 
 
 def prepare_database(filename: str):
@@ -95,7 +95,7 @@ def draw_text(
     y: int,
     screen: pygame.Surface,
     center: bool = True,
-    text_color: tuple[int, int, int] = typing.get_args(settings.Color.BLACK.value),
+    text_color: tuple[int, int, int] = settings.Color.BLACK.value,
     font: pygame.font.FontType = settings.main_font_small,
 ):
     text_obj = font.render(str(text), True, text_color)
