@@ -43,9 +43,9 @@ equation_font_small = pygame.font.SysFont("rasa", 70)
 
 
 class Color(Enum):
+    BACKGROUND = [167, 199, 250]
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
-    BACKGROUND = (167, 199, 250)
     GREEN = (127, 255, 212)
     LIGHT_GREEN = (179, 255, 230)
     LIGHT_RED = (180, 190, 250)
