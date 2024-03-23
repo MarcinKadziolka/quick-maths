@@ -72,7 +72,6 @@ def main_menu():
 
 def time_trial_menu():
     run = True
-
     start_button = Button(
         text="Start",
         width=400,
@@ -81,7 +80,6 @@ def time_trial_menu():
         y=600,
         active=True,
     )
-
     options_layout = CheckBoxLayout(
         ["Addition", "Subtraction", "Multiplication"],
         active=0,
@@ -95,6 +93,12 @@ def time_trial_menu():
 
     checkboxes_x = settings.SCREEN_SIZE.right_third
     checkboxes_y = 200
+    # TODO: remove option 15
+    # also update database and make sure the catogory_id functions is working
+    # update tests accordingly
+    # update mapping
+    # update displaying leaderboard
+    # maybe just literally check for inf symbol
     rounds_layout = CheckBoxLayout(
         texts=["5", "10", "15", "20", "∞"],
         active=1,
@@ -200,7 +204,6 @@ def time_trial_menu():
             y=checkboxes_y + settings.DISTANCE * 3,
             screen=screen,
         )
-
         for event in pygame.event.get():
             navigation.update(event)
             digits_layout.update(event)
@@ -208,8 +211,8 @@ def time_trial_menu():
             rounds_layout.update(event)
             blind_layout.update(event)
             if start_button.check_action(event):
-                loading(seconds=3)
-                time_trial(game_args)
+                if loading(seconds=3):
+                    time_trial(game_args)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     run = False
@@ -255,6 +258,7 @@ def time_trial_menu():
         pygame.display.update()
 
 
+# TODO: fix game breaking when user escapes
 def loading(seconds):
     if seconds <= 1:
         raise Exception("Time must be an integer")
@@ -275,16 +279,15 @@ def loading(seconds):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    run = False
+                    return False
             if event.type == pygame.QUIT:
-                run = False
+                return False
             if event.type == timer_event:
                 counter -= 1
                 if counter == 0:
                     pygame.time.set_timer(timer_event, 0)
-                    return
+                    return True
         pygame.display.update()
-    pygame.quit()
 
 
 def time_trial(game_args):
