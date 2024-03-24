@@ -78,22 +78,22 @@ class Button:
             border_radius=self.border_radius,
         )
 
-    def set_size(self, popup=False):
-        size = (
-            (self.width + self.hover_size, self.height + self.hover_size)
-            if popup
-            else (self.width, self.height)
-        )
+    def set_popup_size(self):
+        size = (self.width + self.hover_size, self.height + self.hover_size)
         self.button = pygame.Rect(0, 0, *size)
-        self.shadow = pygame.Rect(0, 0, *size)
-        self.button.center = (
-            (self.x, self.y - self.hover_pop) if popup else (self.x, self.y)
-        )
-        self.shadow.center = (self.x, self.y + 5) if popup else (self.x, self.y + 5)
+        self.button.center = (self.x, self.y - self.hover_pop)
+
+    def reset_size(self):
+        size = (self.width, self.height)
+        self.button = pygame.Rect(0, 0, *size)
+        self.button.center = self.x, self.y
 
     def draw_up(self, screen):
         pos = pygame.mouse.get_pos()
-        self.set_size(self.hitbox.collidepoint(pos) or self.current)
+        if self.button.collidepoint(pos) or self.current:
+            self.set_popup_size()
+        else:
+            self.reset_size()
         pygame.draw.rect(
             screen,
             self.shadow_color,
