@@ -26,17 +26,13 @@ def main_menu():
     first_button_y = 250
     training_button = Button(
         text="Time trial",
-        width=400,
-        height=50,
-        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y,
+        x=settings.SCREEN_SIZE.mid_x,
         active=True,
     )
 
     countdown_button = Button(
         text="Countdown",
-        width=400,
-        height=50,
         x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y + settings.DISTANCE,
         active=True,
@@ -74,8 +70,6 @@ def time_trial_menu():
     run = True
     start_button = Button(
         text="Start",
-        width=400,
-        height=50,
         x=settings.SCREEN_SIZE.mid_x,
         y=600,
         active=True,
@@ -83,8 +77,6 @@ def time_trial_menu():
     options_layout = CheckBoxLayout(
         ["Addition", "Subtraction", "Multiplication"],
         active=0,
-        height=50,
-        width=400,
         x=settings.SCREEN_SIZE.mid_x,
         y=200,
         center=False,
@@ -102,7 +94,6 @@ def time_trial_menu():
     rounds_layout = CheckBoxLayout(
         texts=["5", "10", "15", "20", "∞"],
         active=1,
-        height=50,
         width=50,
         x=checkboxes_x,
         y=checkboxes_y,
@@ -112,7 +103,6 @@ def time_trial_menu():
     digits_layout = CheckBoxLayout(
         texts=["1", "2", "3", "4"],
         active=1,
-        height=50,
         width=50,
         x=checkboxes_x,
         y=checkboxes_y + settings.DISTANCE * 2,
@@ -122,7 +112,6 @@ def time_trial_menu():
     blind_layout = CheckBoxLayout(
         texts=["off", "0.5", "1", "2"],
         active=0,
-        height=50,
         width=60,
         x=checkboxes_x,
         y=checkboxes_y + settings.DISTANCE * 4,
@@ -293,7 +282,6 @@ def loading(seconds):
 def time_trial(game_args):
     input_field = TextField(
         font=settings.equation_font_small,
-        width=400,
         height=60,
         text_color=settings.Color.BLACK.value,
         active_color=settings.Color.WHITE.value,
@@ -306,8 +294,6 @@ def time_trial(game_args):
 
     answer_button = Button(
         text="Answer",
-        width=400,
-        height=50,
         x=settings.SCREEN_SIZE.mid_x,
         y=settings.SCREEN_SIZE.y - 200,
         active=True,
@@ -412,8 +398,6 @@ def results(background_color, elapsed_time, game_args):
     first_button_y = settings.SCREEN_SIZE.y - 300
     input_field = TextField(
         font=settings.main_font_small,
-        width=400,
-        height=50,
         text_color=settings.Color.BLACK.value,
         active_color=settings.Color.WHITE.value,
         inactive_color=settings.Color.BLACK.value,
@@ -423,16 +407,12 @@ def results(background_color, elapsed_time, game_args):
     )
     save_button = Button(
         text="Save result",
-        width=400,
-        height=50,
         x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y + settings.DISTANCE,
         active=True,
     )
     try_again_button = Button(
         text="Try again",
-        width=400,
-        height=50,
         x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y + settings.DISTANCE * 2,
         active=True,
@@ -497,8 +477,6 @@ def countdown_menu():
 
     start_button = Button(
         "Start",
-        width=400,
-        height=50,
         x=settings.SCREEN_SIZE.mid_x,
         y=settings.SCREEN_SIZE.mid_y + 200,
         active=True,
@@ -578,8 +556,6 @@ def countdown(n_big):
 
     next_button = Button(
         text="Next",
-        width=400,
-        height=50,
         x=settings.SCREEN_SIZE.mid_x,
         y=settings.SCREEN_SIZE.mid_y + 200,
         active=True,
