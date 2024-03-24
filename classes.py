@@ -67,47 +67,6 @@ class Button:
         else:
             return self.inactive_color
 
-    def draw_down(self, screen):
-        self.button.center = self.x, self.y + 5 - self.hover_pop
-        pygame.draw.rect(
-            screen,
-            self.get_color(),
-            self.button,
-            width=0,
-            border_radius=self.border_radius,
-        )
-
-    def set_popup_size(self):
-        size = (self.width + self.hover_size, self.height + self.hover_size)
-        self.button = pygame.Rect(0, 0, *size)
-        self.button.center = (self.x, self.y - self.hover_pop)
-
-    def reset_size(self):
-        size = (self.width, self.height)
-        self.button = pygame.Rect(0, 0, *size)
-        self.button.center = self.x, self.y
-
-    def draw_up(self, screen):
-        pos = pygame.mouse.get_pos()
-        if self.button.collidepoint(pos) or self.current:
-            self.set_popup_size()
-        else:
-            self.reset_size()
-        pygame.draw.rect(
-            screen,
-            self.shadow_color,
-            self.shadow,
-            width=0,
-            border_radius=self.border_radius,
-        )
-        pygame.draw.rect(
-            screen,
-            self.get_color(),
-            self.button,
-            width=0,
-            border_radius=self.border_radius,
-        )
-
     def check_clicked(self):
         pos = pygame.mouse.get_pos()
         left_click = pygame.mouse.get_pressed()[0]
@@ -136,8 +95,37 @@ class Button:
     def check_down(self):
         return self.clicked or self.pressed
 
+    def is_popup(self):
+        pos = pygame.mouse.get_pos()
+        if self.button.collidepoint(pos) or self.current:
+            return True
+        return False
+
+    def set_size(self):
+        self.button = pygame.Rect(0, 0, self.width, self.height)
+        self.button.center = self.x, self.y
+        if self.check_down():
+            self.button.center = self.x, self.y + 5 - self.hover_pop
+        elif self.is_popup():
+            self.button = pygame.Rect(
+                0, 0, self.width + self.hover_size, self.height + self.hover_size
+            )
+            self.button.center = (self.x, self.y - self.hover_pop)
+
     def draw(self, screen):
-        self.draw_down(screen) if self.check_down() else self.draw_up(screen)
+        pygame.draw.rect(
+            screen,
+            self.shadow_color,
+            self.shadow,
+            border_radius=self.border_radius,
+        )
+        self.set_size()
+        pygame.draw.rect(
+            screen,
+            self.get_color(),
+            self.button,
+            border_radius=self.border_radius,
+        )
         functions.draw_text(
             text=self.text,
             text_color=self.text_color,
