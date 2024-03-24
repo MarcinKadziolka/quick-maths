@@ -57,22 +57,21 @@ class Button:
             self.hover_size = 0
             self.hover_pop = 0
 
-    def set_color(self):
-        self.color_to_display = (
-            self.active_and_current_color
-            if (self.active and self.current)
-            else (
-                self.current_color
-                if self.current
-                else self.active_color if self.active else self.inactive_color
-            )
-        )
+    def get_color(self):
+        if self.active and self.current:
+            return self.active_and_current_color
+        elif self.current:
+            return self.current_color
+        elif self.active:
+            return self.active_color
+        else:
+            return self.inactive_color
 
     def draw_down(self, screen):
         self.button.center = self.x, self.y + 5 - self.hover_pop
         pygame.draw.rect(
             screen,
-            self.color_to_display,
+            self.get_color(),
             self.button,
             width=0,
             border_radius=self.border_radius,
@@ -103,7 +102,7 @@ class Button:
         )
         pygame.draw.rect(
             screen,
-            self.color_to_display,
+            self.get_color(),
             self.button,
             width=0,
             border_radius=self.border_radius,
@@ -138,7 +137,6 @@ class Button:
         return self.clicked or self.pressed
 
     def draw(self, screen):
-        self.set_color()
         self.draw_down(screen) if self.check_down() else self.draw_up(screen)
         functions.draw_text(
             text=self.text,
