@@ -9,8 +9,8 @@ class Button:
     def __init__(
         self,
         text,
-        y,
-        x=settings.SCREEN_SIZE.mid_x,
+        y: int = settings.SCREEN_SIZE.mid_y,
+        x: int = settings.SCREEN_SIZE.mid_x,
         width=400,
         height=50,
         font=settings.main_font_small,
@@ -208,9 +208,9 @@ class CheckBoxLayout:
         self,
         texts,
         active,
-        x,
-        y,
-        distance,
+        distance: int,
+        x: int = settings.SCREEN_SIZE.mid_x,
+        y: int = settings.SCREEN_SIZE.mid_y,
         height=50,
         width=400,
         center=True,
@@ -224,7 +224,7 @@ class CheckBoxLayout:
         self.start_y = y
 
         if center:
-            half_length = ((self.num_buttons - 1) * distance) / 2
+            half_length = int(((self.num_buttons - 1) * distance) / 2)
             if orientation == Orientation.HORIZONTAL:
                 self.start_x = x - half_length
             elif orientation == Orientation.VERTICAL:
@@ -237,9 +237,9 @@ class CheckBoxLayout:
                 Button(
                     text=str(text),
                     width=width,
-                    height=height,
-                    x=self.start_x,
                     y=self.start_y,
+                    x=self.start_x,
+                    height=height,
                     active=(i == active),
                     inactive_color=inactive_color,
                 )
@@ -272,9 +272,9 @@ class TextField:
         text_color,
         active_color,
         inactive_color,
-        x,
-        y,
         prompt_text,
+        x=settings.SCREEN_SIZE.mid_x,
+        y=settings.SCREEN_SIZE.mid_y,
         width=500,
         height=50,
         numeric_only=False,

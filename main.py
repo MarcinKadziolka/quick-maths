@@ -27,13 +27,11 @@ def main_menu():
     training_button = Button(
         text="Time trial",
         y=first_button_y,
-        x=settings.SCREEN_SIZE.mid_x,
         active=True,
     )
 
     countdown_button = Button(
         text="Countdown",
-        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y + settings.DISTANCE,
         active=True,
     )
@@ -44,7 +42,6 @@ def main_menu():
         functions.draw_text(
             text="QuickMaths",
             font=settings.main_font,
-            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -70,14 +67,12 @@ def time_trial_menu():
     run = True
     start_button = Button(
         text="Start",
-        x=settings.SCREEN_SIZE.mid_x,
         y=600,
         active=True,
     )
     options_layout = CheckBoxLayout(
         ["Addition", "Subtraction", "Multiplication"],
         active=0,
-        x=settings.SCREEN_SIZE.mid_x,
         y=200,
         center=False,
         distance=settings.DISTANCE,
@@ -173,7 +168,6 @@ def time_trial_menu():
         functions.draw_text(
             text="Time trial",
             font=settings.main_font,
-            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -260,7 +254,6 @@ def loading(seconds):
         functions.draw_text(
             text=counter,
             font=settings.main_font,
-            x=settings.SCREEN_SIZE.mid_x,
             y=settings.SCREEN_SIZE.y - 500,
             screen=screen,
             center=True,
@@ -286,7 +279,6 @@ def time_trial(game_args):
         text_color=settings.Color.BLACK.value,
         active_color=settings.Color.WHITE.value,
         inactive_color=settings.Color.BLACK.value,
-        x=settings.SCREEN_SIZE.mid_x,
         y=settings.SCREEN_SIZE.y - 300,
         prompt_text="",
         numeric_only=True,
@@ -294,7 +286,6 @@ def time_trial(game_args):
 
     answer_button = Button(
         text="Answer",
-        x=settings.SCREEN_SIZE.mid_x,
         y=settings.SCREEN_SIZE.y - 200,
         active=True,
     )
@@ -329,7 +320,6 @@ def time_trial(game_args):
         functions.draw_text(
             text="Time trial",
             font=settings.main_font,
-            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -377,7 +367,6 @@ def time_trial(game_args):
             functions.draw_text(
                 text=f"{current_equation[0]} {current_equation[3]} {current_equation[1]}",
                 font=settings.equation_font_small,
-                x=settings.SCREEN_SIZE.mid_x,
                 y=settings.SCREEN_SIZE.y - 500,
                 screen=screen,
             )
@@ -401,19 +390,16 @@ def results(background_color, elapsed_time, game_args):
         text_color=settings.Color.BLACK.value,
         active_color=settings.Color.WHITE.value,
         inactive_color=settings.Color.BLACK.value,
-        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y,
         prompt_text="",
     )
     save_button = Button(
         text="Save result",
-        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y + settings.DISTANCE,
         active=True,
     )
     try_again_button = Button(
         text="Try again",
-        x=settings.SCREEN_SIZE.mid_x,
         y=first_button_y + settings.DISTANCE * 2,
         active=True,
     )
@@ -424,7 +410,6 @@ def results(background_color, elapsed_time, game_args):
         functions.draw_text(
             text=elapsed_time,
             font=settings.main_font,
-            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -469,7 +454,6 @@ def countdown_menu():
         active=2,
         height=80,
         width=80,
-        x=settings.SCREEN_SIZE.mid_x,
         y=settings.SCREEN_SIZE.mid_y,
         distance=100,
         orientation=Orientation.HORIZONTAL,
@@ -477,7 +461,6 @@ def countdown_menu():
 
     start_button = Button(
         "Start",
-        x=settings.SCREEN_SIZE.mid_x,
         y=settings.SCREEN_SIZE.mid_y + 200,
         active=True,
     )
@@ -503,14 +486,12 @@ def countdown_menu():
         functions.draw_text(
             text="Countdown",
             font=settings.main_font,
-            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
 
         functions.draw_text(
             text="How many big numbers?",
-            x=settings.SCREEN_SIZE.mid_x,
             y=170,
             screen=screen,
         )
@@ -547,7 +528,6 @@ def countdown(n_big):
         active=-1,
         height=80,
         width=80,
-        x=settings.SCREEN_SIZE.mid_x,
         y=settings.SCREEN_SIZE.mid_y,
         distance=100,
         orientation=Orientation.HORIZONTAL,
@@ -556,7 +536,6 @@ def countdown(n_big):
 
     next_button = Button(
         text="Next",
-        x=settings.SCREEN_SIZE.mid_x,
         y=settings.SCREEN_SIZE.mid_y + 200,
         active=True,
     )
@@ -572,7 +551,6 @@ def countdown(n_big):
         functions.draw_text(
             text="Countdown",
             font=settings.main_font,
-            x=settings.SCREEN_SIZE.mid_x,
             y=70,
             screen=screen,
         )
@@ -580,7 +558,6 @@ def countdown(n_big):
         functions.draw_text(
             text=target,
             font=settings.main_font,
-            x=settings.SCREEN_SIZE.mid_x,
             y=settings.SCREEN_SIZE.mid_y - 100,
             screen=screen,
         )

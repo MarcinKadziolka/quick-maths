@@ -91,9 +91,9 @@ def prepare_database(filename: str):
 
 def draw_text(
     text,
-    x: int,
-    y: int,
     screen: pygame.Surface,
+    x: int = settings.SCREEN_SIZE.mid_x,
+    y: int = settings.SCREEN_SIZE.mid_y,
     center: bool = True,
     text_color: tuple[int, int, int] = settings.Color.BLACK.value,
     font: pygame.font.FontType = settings.main_font_small,
