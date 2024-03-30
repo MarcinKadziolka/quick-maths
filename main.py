@@ -104,7 +104,7 @@ def time_trial_menu():
         distance=settings.DISTANCE,
         orientation=Orientation.HORIZONTAL,
     )
-    blind_layout = CheckBoxLayout(
+    flash_layout = CheckBoxLayout(
         texts=["off", "0.5", "1", "2"],
         active=0,
         width=60,
@@ -118,7 +118,7 @@ def time_trial_menu():
                     2 rounds_layout
     1 options_layout
                     3 digits_layout
-                    4 blind layout
+                    4 flash layout
     0 start_button
     """
     nav = {
@@ -139,7 +139,7 @@ def time_trial_menu():
         (3, 1, pygame.K_UP): (2, 1),
         (3, 2, pygame.K_UP): (2, 2),
         (3, 3, pygame.K_UP): (2, 3),
-        # blind_layout nav
+        # flash_layout nav
         (4, 0, pygame.K_DOWN): (0, 0),
         (4, 1, pygame.K_DOWN): (0, 0),
         (4, 2, pygame.K_DOWN): (0, 0),
@@ -159,7 +159,7 @@ def time_trial_menu():
     }
     d_navigation = defaultdict(tuple, nav)
     navigation = Navigation(
-        [button_layout, options_layout, rounds_layout, digits_layout, blind_layout],
+        [button_layout, options_layout, rounds_layout, digits_layout, flash_layout],
         navigation=d_navigation,
     )
     game_args = {}
@@ -181,7 +181,7 @@ def time_trial_menu():
         )
 
         functions.draw_text(
-            text="Blind mode",
+            text="Flash mode",
             font=settings.main_font_small,
             x=checkboxes_x,
             y=checkboxes_y + settings.DISTANCE * 3,
@@ -192,7 +192,7 @@ def time_trial_menu():
             digits_layout.update(event)
             options_layout.update(event)
             rounds_layout.update(event)
-            blind_layout.update(event)
+            flash_layout.update(event)
             if start_button.check_action(event):
                 if loading(seconds=3):
                     time_trial(game_args)
@@ -218,7 +218,7 @@ def time_trial_menu():
         digits_layout.display(screen)
         options_layout.display(screen)
         rounds_layout.display(screen)
-        blind_layout.display(screen)
+        flash_layout.display(screen)
         start_button.draw(screen)
 
         operation_str = options_layout.buttons[options_layout.active_id].text.lower()
@@ -229,7 +229,7 @@ def time_trial_menu():
         game_args["num_digits"] = int(
             digits_layout.buttons[digits_layout.active_id].text
         )
-        game_args["blind"] = blind_layout.buttons[blind_layout.active_id].text
+        game_args["flash"] = flash_layout.buttons[flash_layout.active_id].text
 
         if rounds_layout.active_id != 4:  # if not infinity
             functions.show_leaderboard(
@@ -293,12 +293,12 @@ def time_trial(game_args):
     n = game_args["num_operations"]
     operator = functions.operation_to_operator[game_args["mode"]]
     num_digits = game_args["num_digits"]
-    blind_time = game_args["blind"]
+    flash_time = game_args["flash"]
 
-    if blind_time == "off":
-        blind_time = 99999
+    if flash_time == "off":
+        flash_time = 99999
     else:
-        blind_time = float(blind_time)
+        flash_time = float(flash_time)
 
     equations = iter(functions.get_all_equations(operator, n, num_digits))
     current_equation = next(equations)
@@ -313,7 +313,7 @@ def time_trial(game_args):
     current_equation_index = 1
 
     answer_button.current = True
-    blind_timer = time.time()
+    flash_timer = time.time()
     while run:
         elapsed_time = f"{time.time() - start:.2f}"
         screen.fill(background_color)
@@ -336,7 +336,7 @@ def time_trial(game_args):
                     background_color[2] = max(background_color[2] - green_step, 0)
                     current_equation_index += 1
                     try:
-                        blind_timer = time.time()
+                        flash_timer = time.time()
                         current_equation = next(equations)
                     except StopIteration as _:
                         run = results(background_color, elapsed_time, game_args)
@@ -363,7 +363,7 @@ def time_trial(game_args):
             screen=screen,
         )
 
-        if time.time() - blind_timer < blind_time:
+        if time.time() - flash_timer < flash_time:
             functions.draw_text(
                 text=f"{current_equation[0]} {current_equation[3]} {current_equation[1]}",
                 font=settings.equation_font_small,

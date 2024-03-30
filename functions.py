@@ -84,7 +84,7 @@ def prepare_database(filename: str):
         )
         """
     )
-    # TODO: add blind time table
+    # TODO: add flash time table
     connection.commit()
     connection.close()
 
