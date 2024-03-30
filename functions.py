@@ -1,5 +1,6 @@
 import datetime
 import sqlite3
+from typing import Literal
 import settings
 import random
 import pygame
@@ -8,45 +9,26 @@ operation_to_operator = {"addition": "+", "subtraction": "-", "multiplication": 
 digit_id_to_num = {0: 5, 1: 10, 2: 15, 3: 20, 4: 99999}
 
 
-def prepare_database(filename: str):
+def prepare_database(
+    filename: str,
+):
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
     cursor.execute(
         """
         CREATE TABLE "amount" (
 	        "amount_id" INTEGER,
-	        "num_amount" INTEGER,
+	        "amount_of_calculations" INTEGER,
 	        PRIMARY KEY("amount_id")
         )"""
     )
 
     cursor.execute(
-        """
-        CREATE TABLE "category" (
-            "category_id" INTEGER,
-            "name" TEXT,
-            "amount_id" INTEGER,
-            PRIMARY KEY("category_id"),
-            FOREIGN KEY("amount_id") REFERENCES "amount"("amount_id")
-        )
-        """
-    )
-    cursor.execute(
         """ 
-        CREATE TABLE "digit" (
+        CREATE TABLE "digits" (
             "digit_id" INTEGER,
-            "num_digit" INTEGER,
+            "num_of_digits_per_variable" INTEGER,
             PRIMARY KEY("digit_id")
-        )
-        """
-    )
-    cursor.execute(
-        """
-        CREATE TABLE "category_digit" (
-            "category_id" INTEGER,
-            "digit_id" INTEGER,
-            FOREIGN KEY("category_id") REFERENCES "category"("category_id"),
-            FOREIGN KEY("digit_id") REFERENCES "digit"("digit_id")
         )
         """
     )
@@ -55,7 +37,7 @@ def prepare_database(filename: str):
         """ 
         CREATE TABLE "operation" (
             "operation_id" INTEGER,
-            "name" TEXT,
+            "operation_name" TEXT,
             PRIMARY KEY("operation_id")
         )
         """
@@ -63,11 +45,26 @@ def prepare_database(filename: str):
 
     cursor.execute(
         """ 
-        CREATE TABLE "category_operation" (
+        CREATE TABLE "flash" (
+            "flash_id" INTEGER,
+            "flash_time" DOUBLE,
+            PRIMARY KEY("flash_id")
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE "category" (
             "category_id" INTEGER,
+            "amount_id" INTEGER,
+            "digit_id" INTEGER,
             "operation_id" INTEGER,
-            FOREIGN KEY("category_id") REFERENCES "category"("category_id"),
-            FOREIGN KEY("operation_id") REFERENCES "operation"("operation_id")
+            "flash_id" INTEGER,
+            PRIMARY KEY("category_id"),
+            FOREIGN KEY("amount_id") REFERENCES "amount"("amount_id"),
+            FOREIGN KEY("digit_id") REFERENCES "digits"("digit_id"),
+            FOREIGN KEY("operation_id") REFERENCES "operation"("operation_id"),
+            FOREIGN KEY("flash_id") REFERENCES "flash"("flash_id")
         )
         """
     )
@@ -76,15 +73,53 @@ def prepare_database(filename: str):
         """
         CREATE TABLE "score" (
             "score_id" INTEGER,
-            "name" STRING,
+            "username" STRING,
             "result" DOUBLE,
             "date" DATE,
             "category_id" INTEGER,
-            PRIMARY KEY("score_id")
+            PRIMARY KEY("score_id"),
+            FOREIGN KEY("category_id") REFERENCES "category"("category_id")
         )
         """
     )
-    # TODO: add flash time table
+    connection.commit()
+    connection.close()
+
+
+def populate_database(
+    filename: str,
+    num_of_digits: tuple[int, ...],
+    amounts_of_calculations: tuple[int, ...],
+    operations_names: tuple[str, ...],
+    flash_times: tuple[None | float, ...],
+):
+    # open database if it exists
+    connection = sqlite3.connect(f"file:{filename}?mode=rw", uri=True)
+    cursor = connection.cursor()
+    for amount in amounts_of_calculations:
+        cursor.execute(
+            f"""
+            INSERT INTO amount (amount_of_calculations) values ({amount})
+            """
+        )
+    for name in operations_names:
+        cursor.execute(
+            f"""
+            INSERT INTO operation (operation_name) values ('{name}')
+            """
+        )
+    for num in num_of_digits:
+        cursor.execute(
+            f"""
+            INSERT INTO digits (num_of_digits_per_variable) values ({num})
+            """
+        )
+    for time in flash_times:
+        cursor.execute(
+            f"""
+            INSERT INTO flash (flash_time) values ({time})
+            """
+        )
     connection.commit()
     connection.close()
 
