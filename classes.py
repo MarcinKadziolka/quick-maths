@@ -5,6 +5,11 @@ from enum import Enum
 from collections import defaultdict
 
 
+class Orientation(Enum):
+    HORIZONTAL = 0
+    VERTICAL = 1
+
+
 class Button:
     def __init__(
         self,
@@ -136,59 +141,6 @@ class Button:
         )
 
 
-class Orientation(Enum):
-    HORIZONTAL = 0
-    VERTICAL = 1
-
-
-class ButtonLayout:
-    def __init__(self, buttons) -> None:
-        if not isinstance(buttons, list):
-            raise Exception("Argument provided must a list")
-        self.buttons = buttons
-
-    def display(self, screen):
-        for button in self.buttons:
-            button.draw(screen)
-
-    def update(self, event):
-        for button in self.buttons:
-            if button.check_clicked():
-                button.run()
-
-    def __len__(self):
-        return len(self.buttons)
-
-
-class Navigation:
-    def __init__(self, layouts, navigation: defaultdict = defaultdict(tuple, {})):
-        self.layout_id = 0
-        self.button_id = 0
-        self.layouts = layouts
-        self.layouts[self.layout_id].buttons[self.button_id].current = True
-        self.navigation = navigation
-
-    def get_next_id(self, event):
-        curr_layout = self.layouts[self.layout_id]
-        n_buttons = len(curr_layout)
-        if event.type != pygame.KEYDOWN:
-            return
-        if target := self.navigation[(self.layout_id, self.button_id, event.key)]:
-            self.layout_id, self.button_id = target[0], target[1]
-            return
-        if event.key in (pygame.K_DOWN, pygame.K_RIGHT):
-            if self.button_id + 1 < n_buttons:
-                self.button_id += 1
-        elif event.key in (pygame.K_UP, pygame.K_LEFT):
-            if self.button_id - 1 >= 0:
-                self.button_id -= 1
-
-    def update(self, event):
-        self.layouts[self.layout_id].buttons[self.button_id].current = False
-        self.get_next_id(event)
-        self.layouts[self.layout_id].buttons[self.button_id].current = True
-
-
 class CheckBoxLayout:
     def __init__(
         self,
@@ -249,6 +201,58 @@ class CheckBoxLayout:
 
     def __len__(self):
         return len(self.buttons)
+
+
+class ButtonLayout:
+    def __init__(self, buttons: list[Button]) -> None:
+        if not isinstance(buttons, list):
+            raise Exception("Argument provided must a list")
+        self.buttons = buttons
+
+    def display(self, screen):
+        for button in self.buttons:
+            button.draw(screen)
+
+    def update(self, event):
+        for button in self.buttons:
+            if button.check_clicked():
+                button.run()
+
+    def __len__(self):
+        return len(self.buttons)
+
+
+class Navigation:
+    def __init__(
+        self,
+        layouts: list[ButtonLayout | CheckBoxLayout],
+        navigation: defaultdict = defaultdict(tuple, {}),
+    ):
+        self.layout_id = 0
+        self.button_id = 0
+        self.layouts = layouts
+        self.layouts[self.layout_id].buttons[self.button_id].current = True
+        self.navigation = navigation
+
+    def get_next_id(self, event):
+        curr_layout = self.layouts[self.layout_id]
+        n_buttons = len(curr_layout)
+        if event.type != pygame.KEYDOWN:
+            return
+        if target := self.navigation[(self.layout_id, self.button_id, event.key)]:
+            self.layout_id, self.button_id = target[0], target[1]
+            return
+        if event.key in (pygame.K_DOWN, pygame.K_RIGHT):
+            if self.button_id + 1 < n_buttons:
+                self.button_id += 1
+        elif event.key in (pygame.K_UP, pygame.K_LEFT):
+            if self.button_id - 1 >= 0:
+                self.button_id -= 1
+
+    def update(self, event):
+        self.layouts[self.layout_id].buttons[self.button_id].current = False
+        self.get_next_id(event)
+        self.layouts[self.layout_id].buttons[self.button_id].current = True
 
 
 class TextField:
