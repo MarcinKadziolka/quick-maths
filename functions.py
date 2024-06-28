@@ -1,6 +1,5 @@
 import datetime
 import sqlite3
-from typing import Literal
 import settings
 import random
 import pygame
@@ -140,7 +139,6 @@ def draw_text(
     screen.blit(text_obj, text_rect)
 
 
-# TODO: test function
 def select_category_id(cursor: sqlite3.Cursor, game_args: dict):
     operation = game_args["mode"]
     digit = game_args["num_digits"]
