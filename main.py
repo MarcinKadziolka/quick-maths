@@ -241,7 +241,6 @@ def time_trial_menu():
         pygame.display.update()
 
 
-# TODO: fix game breaking when user escapes
 def loading(seconds):
     if seconds <= 1:
         raise Exception("Time must be an integer")
@@ -443,8 +442,6 @@ def results(background_color, elapsed_time, game_args):
         try_again_button.draw(screen)
         save_button.draw(screen)
         pygame.display.update()
-
-    pygame.quit()
 
 
 def countdown_menu():
