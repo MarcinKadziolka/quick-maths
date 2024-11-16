@@ -4,7 +4,7 @@ import pygame
 from database import read_results
 
 operation_to_operator = {"addition": "+", "subtraction": "-", "multiplication": "*"}
-digit_id_to_num = {0: 5, 1: 10, 2: 15, 3: 20, 4: 99999}
+digit_id_to_num = {0: 5, 1: 10, 2: 99999}
 
 
 def draw_text(

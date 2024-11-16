@@ -36,7 +36,12 @@ SCREEN_SIZE = ScreenSize(infoObject.current_w, infoObject.current_h)
 
 DISTANCE = 80
 SLEEP_DURATION = 0.1
-
+DIGITS = (1, 2, 3, 4)
+FLASH = ("off", "on")
+OPERATIONS = ("addition", "multiplication", "subtraction")
+AMOUNTS = (5, 10)
+DATABASE_NAME = "scores.db"
+FLASH_TIME = 1
 main_font = pygame.font.SysFont("rasa", 80)
 main_font_small = pygame.font.SysFont("rasa", 50)
 equation_font_small = pygame.font.SysFont("rasa", 70)

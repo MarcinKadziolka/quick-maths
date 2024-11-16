@@ -1,6 +1,7 @@
 import pygame
 import settings
 import functions
+import database
 from classes import (
     Button,
     TextField,
@@ -19,6 +20,16 @@ os.environ["SDL_VIDEO_CENTERED"] = "1"
 pygame.init()
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption("Quick Maths")
+
+if not os.path.exists(f"./{settings.DATABASE_NAME}"):
+    database.prepare_database(filename=settings.DATABASE_NAME)
+    database.populate_database(
+        filename=settings.DATABASE_NAME,
+        num_of_digits=settings.DIGITS,
+        amounts_of_calculations=settings.AMOUNTS,
+        operations_names=settings.OPERATIONS,
+        flash_times=settings.FLASH,
+    )
 
 
 def main_menu():
@@ -71,7 +82,7 @@ def time_trial_menu():
         active=True,
     )
     options_layout = CheckBoxLayout(
-        ["Addition", "Subtraction", "Multiplication"],
+        settings.OPERATIONS,
         active=0,
         y=200,
         center=False,
@@ -80,14 +91,8 @@ def time_trial_menu():
 
     checkboxes_x = settings.SCREEN_SIZE.right_third
     checkboxes_y = 200
-    # TODO: remove option 15
-    # also update database and make sure the catogory_id functions is working
-    # update tests accordingly
-    # update mapping
-    # update displaying leaderboard
-    # maybe just literally check for inf symbol
     rounds_layout = CheckBoxLayout(
-        texts=["5", "10", "15", "20", "∞"],
+        texts=list(settings.AMOUNTS) + ["∞"],
         active=1,
         width=50,
         x=checkboxes_x,
@@ -96,7 +101,7 @@ def time_trial_menu():
         orientation=Orientation.HORIZONTAL,
     )
     digits_layout = CheckBoxLayout(
-        texts=["1", "2", "3", "4"],
+        texts=settings.DIGITS,
         active=1,
         width=50,
         x=checkboxes_x,
@@ -105,7 +110,7 @@ def time_trial_menu():
         orientation=Orientation.HORIZONTAL,
     )
     flash_layout = CheckBoxLayout(
-        texts=["off", "0.5", "1", "2"],
+        texts=settings.FLASH,
         active=0,
         width=60,
         x=checkboxes_x,
@@ -132,23 +137,19 @@ def time_trial_menu():
         # digits_layout nav
         (3, 0, pygame.K_LEFT): (1, 2),
         (3, 0, pygame.K_DOWN): (4, 0),
-        (3, 1, pygame.K_DOWN): (4, 1),
-        (3, 2, pygame.K_DOWN): (4, 2),
-        (3, 3, pygame.K_DOWN): (4, 3),
+        (3, 1, pygame.K_DOWN): (4, 0),
         (3, 0, pygame.K_UP): (2, 0),
         (3, 1, pygame.K_UP): (2, 1),
         (3, 2, pygame.K_UP): (2, 2),
-        (3, 3, pygame.K_UP): (2, 3),
+        (3, 3, pygame.K_UP): (2, 2),
+        (3, 2, pygame.K_DOWN): (4, 1),
+        (3, 3, pygame.K_DOWN): (4, 1),
         # flash_layout nav
         (4, 0, pygame.K_DOWN): (0, 0),
-        (4, 1, pygame.K_DOWN): (0, 0),
-        (4, 2, pygame.K_DOWN): (0, 0),
-        (4, 3, pygame.K_DOWN): (0, 0),
-        (4, 0, pygame.K_UP): (3, 0),
-        (4, 1, pygame.K_UP): (3, 1),
-        (4, 2, pygame.K_UP): (3, 2),
-        (4, 3, pygame.K_UP): (3, 3),
         (4, 0, pygame.K_LEFT): (0, 0),
+        (4, 0, pygame.K_UP): (3, 1),
+        (4, 1, pygame.K_DOWN): (0, 0),
+        (4, 1, pygame.K_UP): (3, 2),
         # rounds_layout nav
         (2, 0, pygame.K_LEFT): (1, 0),
         (2, 0, pygame.K_DOWN): (3, 0),
@@ -231,7 +232,7 @@ def time_trial_menu():
         )
         game_args["flash"] = flash_layout.buttons[flash_layout.active_id].text
 
-        if rounds_layout.active_id != 4:  # if not infinity
+        if rounds_layout.active_id != 2:  # if not infinity
             functions.show_leaderboard(
                 game_args=game_args,
                 screen=screen,
@@ -297,7 +298,7 @@ def time_trial(game_args):
     if flash_time == "off":
         flash_time = 99999
     else:
-        flash_time = float(flash_time)
+        flash_time = settings.FLASH_TIME
 
     equations = iter(functions.get_all_equations(operator, n, num_digits))
     current_equation = next(equations)
@@ -416,7 +417,7 @@ def results(background_color, elapsed_time, game_args):
             navigation.update(event)
             input_field.get_event(event)
             if save_button.check_action(event):
-                functions.save(game_args, input_field.user_input, elapsed_time)
+                database.save(game_args, input_field.user_input, elapsed_time)
                 save_button.active = False
             if try_again_button.check_action(event):
                 return False

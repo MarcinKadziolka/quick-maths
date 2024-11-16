@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+import settings
 
 
 def prepare_database(
@@ -40,7 +41,7 @@ def prepare_database(
         """ 
         CREATE TABLE "flash" (
             "flash_id" INTEGER,
-            "flash_time" DOUBLE,
+            "flash_time" TEXT,
             PRIMARY KEY("flash_id")
         )
         """
@@ -82,9 +83,9 @@ def prepare_database(
 def populate_database(
     filename: str,
     num_of_digits: tuple[int, ...],
-    amounts_of_calculations: tuple[int, ...],
+    amounts_of_calculations: tuple[int | str, ...],
     operations_names: tuple[str, ...],
-    flash_times: tuple[None | float, ...],
+    flash_times: tuple[str, ...],
 ):
     # open database if it exists
     connection = sqlite3.connect(f"file:{filename}?mode=rw", uri=True)
@@ -110,9 +111,20 @@ def populate_database(
     for time in flash_times:
         cursor.execute(
             f"""
-            INSERT INTO flash (flash_time) values ({time})
+            INSERT INTO flash (flash_time) values ('{time}')
             """
         )
+    for amount_id, amount in enumerate(amounts_of_calculations, start=1):
+        for operation_id, operation in enumerate(operations_names, start=1):
+            for digit_id, digit in enumerate(num_of_digits, start=1):
+                for flash_id, flash in enumerate(flash_times, start=1):
+                    cursor.execute(
+                        """
+                        INSERT INTO category (amount_id, digit_id, operation_id, flash_id) values (?, ?, ?, ?)
+                        """,
+                        (amount_id, digit_id, operation_id, flash_id),
+                    )
+
     connection.commit()
     connection.close()
 
@@ -121,10 +133,35 @@ def select_category_id(cursor: sqlite3.Cursor, game_args: dict):
     operation = game_args["mode"]
     digit = game_args["num_digits"]
     amount = game_args["num_operations"]
-    category_name = f"{operation}_digits_{digit}_amount_{amount}"
+    flash = game_args["flash"]
+
     cursor.execute(
-        "SELECT category_id FROM category WHERE name=?",
-        (category_name,),
+        "SELECT operation_id FROM operation WHERE operation_name=?",
+        (operation,),
+    )
+    operation_id = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT digit_id FROM digits WHERE num_of_digits_per_variable=?",
+        (digit,),
+    )
+    digit_id = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT amount_id FROM amount WHERE amount_of_calculations=?",
+        (amount,),
+    )
+    amount_id = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT flash_id FROM flash WHERE flash_time=?",
+        (flash,),
+    )
+    flash_id = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT category_id FROM category WHERE operation_id=? AND digit_id=? AND amount_id=? AND flash_id=?",
+        (operation_id, digit_id, amount_id, flash_id),
     )
     return cursor.fetchone()[0]
 
@@ -136,7 +173,7 @@ def save(game_args: dict, username: str, result: float):
     category_id = select_category_id(cursor, game_args)
     cursor.execute(
         """
-                   SELECT COUNT(1) FROM score WHERE name = ? AND result = ? AND date = ? AND category_id = ?
+                   SELECT COUNT(1) FROM score WHERE username = ? AND result = ? AND date = ? AND category_id = ?
                    """,
         (username, result, date, category_id),
     )
@@ -145,7 +182,7 @@ def save(game_args: dict, username: str, result: float):
         return
     cursor.execute(
         """
-            INSERT INTO score (name, result, date, category_id) VALUES (?, ?, ?, ?)
+            INSERT INTO score (username, result, date, category_id) VALUES (?, ?, ?, ?)
         """,
         (username, result, date, category_id),
     )
@@ -163,14 +200,3 @@ def read_results(game_args: dict):
     to_show_sorted = sorted(to_show, key=lambda x: x[1])[:10]
     database.close()
     return to_show_sorted
-
-
-if __name__ == "__main__":
-    prepare_database("scores.db")
-    populate_database(
-        "scores.db",
-        num_of_digits=(1, 2, 3, 4),
-        amounts_of_calculations=(5, 10, 15, 20),
-        operations_names=("Addition", "Multiplication", "Subtraction"),
-        flash_times=(0.5, 1, 2),
-    )
