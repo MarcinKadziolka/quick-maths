@@ -325,10 +325,8 @@ def time_trial(game_args):
         )
         for event in pygame.event.get():
             input_field.get_event(event)
-            if answer_button.check_action(event):
-                if input_field.user_input == "":
-                    pass
-                elif functions.check_equation(
+            if len(input_field.user_input) == len(str(current_equation[2])):
+                if functions.check_equation(
                     input_field.user_input, current_equation[2]
                 ):
                     background_color[0] = max(background_color[0] - green_step, 0)
