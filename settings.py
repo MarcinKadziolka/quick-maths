@@ -42,9 +42,10 @@ OPERATIONS = ("addition", "multiplication", "subtraction")
 AMOUNTS = (5, 10)
 DATABASE_NAME = "scores.db"
 FLASH_TIME = 1
-main_font = pygame.font.SysFont("rasa", 80)
-main_font_small = pygame.font.SysFont("rasa", 50)
-equation_font_small = pygame.font.SysFont("rasa", 70)
+
+main_font = pygame.font.Font("./fonts/rasa.ttf", 80)
+main_font_small = pygame.font.Font("./fonts/rasa.ttf", 50)
+equation_font_small = pygame.font.Font("./fonts/rasa.ttf", 70)
 
 
 class Color(Enum):
