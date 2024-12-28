@@ -2,7 +2,7 @@
 
 Quickmaths is a pygame based game allowing to sharpen arithmetic skills and math creativity using two fun playing modes: time trial and countdown.
 
-<img src="https://github.com/user-attachments/assets/098baad5-7b62-4f81-bde7-c367433f6ffc" alt="Time trial" width="500"/>
+<img src="https://github.com/user-attachments/assets/098baad5-7b62-4f81-bde7-c367433f6ffc" alt="Time trial" width="600"/>
 
 ## Time trial
 
@@ -12,7 +12,7 @@ In the menu choose the preferable operation, number of digits in the number and 
 
 Save your best runs and become the first in the ranking!
 
-<img src="https://github.com/user-attachments/assets/4032f686-b8f1-43ae-b241-f109eab1be99" alt="Time trial menu" width="500"/>
+<img src="https://github.com/user-attachments/assets/4032f686-b8f1-43ae-b241-f109eab1be99" alt="Time trial menu" width="600"/>
 
 
 
@@ -22,7 +22,7 @@ This mode originates from the numbers game in the british game show called Count
 
 Players, using four basic operators (+, -, x, /) and the tiled numbers try to get as close as possible to the randomly generated target.
 
-<img src="https://github.com/user-attachments/assets/f6b5ac03-cd9f-482b-b936-8ee8fe08f3a4" alt="Countdown" width="500"/>
+<img src="https://github.com/user-attachments/assets/f6b5ac03-cd9f-482b-b936-8ee8fe08f3a4" alt="Countdown" width="600"/>
 
 The official rules are: 
 
