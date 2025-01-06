@@ -416,7 +416,7 @@ def results(background_color, elapsed_time, game_args):
             input_field.get_event(event)
             if save_button.check_action(event):
                 database.save(game_args, input_field.user_input, elapsed_time)
-                save_button.active = False
+                save_button.disabled = True
             if try_again_button.check_action(event):
                 return False
 
