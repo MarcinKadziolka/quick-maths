@@ -26,6 +26,7 @@ class Button:
         current_color=settings.Color.GREEN.value,
         active_and_current_color=settings.Color.LIGHT_GREEN.value,
         active=False,
+        disabled=False,
         on_hover=True,
     ):
         self.x = x
@@ -54,6 +55,7 @@ class Button:
         self.pressed = False
         self.current = False
         self.active = active
+        self.disabled = disabled
 
         if on_hover:
             self.hover_size = 2
@@ -73,6 +75,8 @@ class Button:
             return self.inactive_color
 
     def check_clicked(self):
+        if self.disabled:
+            return
         pos = pygame.mouse.get_pos()
         left_click = pygame.mouse.get_pressed()[0]
         if self.button.collidepoint(pos) and left_click and not self.clicked:
@@ -83,6 +87,8 @@ class Button:
         return False
 
     def check_pressed(self, event):
+        if self.disabled:
+            return
         if not self.current:
             return
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
