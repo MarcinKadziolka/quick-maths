@@ -13,7 +13,7 @@ def draw_text(
     x: int = settings.SCREEN_SIZE.mid_x,
     y: int = settings.SCREEN_SIZE.mid_y,
     center: bool = True,
-    text_color: tuple[int, int, int] = settings.Colors.BLACK.value,
+    text_color: tuple[int, int, int] = settings.COLORS["black"].rgb(),
     font: pygame.font.FontType = settings.main_font_small,
 ):
     text_obj = font.render(str(text), True, text_color)

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import pygame
 import functions
 import settings
@@ -19,12 +20,12 @@ class Button:
         width=400,
         height=50,
         font=settings.main_font_small,
-        text_color=settings.Colors.BLACK.value,
-        color=settings.Colors.WHITE.value,
-        shadow_color=settings.Colors.BLACK.value,
-        inactive_color=settings.Colors.GRAY.value,
-        current_color=settings.Colors.GREEN.value,
-        active_and_current_color=settings.Colors.LIGHT_GREEN.value,
+        text_color=settings.COLORS["black"].rgb(),
+        color=settings.COLORS["white"].rgb(),
+        shadow_color=settings.COLORS["black"].rgb(),
+        inactive_color=settings.COLORS["gray"].rgb(),
+        current_color=settings.COLORS["green"].rgb(),
+        active_and_current_color=settings.COLORS["light_green"].rgb(),
         active=False,
         disabled=False,
         on_hover=True,
@@ -159,7 +160,7 @@ class CheckBoxLayout:
         width=400,
         center=True,
         orientation=Orientation.VERTICAL,
-        inactive_color=settings.Colors.GRAY.value,
+        inactive_color=settings.COLORS["gray"].rgb(),
     ) -> None:
         self.num_buttons = len(texts)
         self.buttons = []

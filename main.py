@@ -49,7 +49,7 @@ def main_menu():
     button_layout = ButtonLayout([training_button, countdown_button])
     layout = Navigation([button_layout])
     while run:
-        screen.fill(settings.Colors.BACKGROUND.value)
+        screen.fill(settings.COLORS["background"].rgb())
         functions.draw_text(
             text="QuickMaths",
             font=settings.main_font,
@@ -165,7 +165,7 @@ def time_trial_menu():
     )
     game_args = {}
     while run:
-        screen.fill(settings.Colors.BACKGROUND.value)
+        screen.fill(settings.COLORS["background"].rgb())
         functions.draw_text(
             text="Time trial",
             font=settings.main_font,
@@ -250,7 +250,7 @@ def loading(seconds):
     counter = seconds
     run = True
     while run:
-        screen.fill(settings.Colors.BACKGROUND.value)
+        screen.fill(settings.COLORS["background"].rgb())
         functions.draw_text(
             text=counter,
             font=settings.main_font,
@@ -276,9 +276,9 @@ def time_trial(game_args):
     input_field = TextField(
         font=settings.equation_font_small,
         height=60,
-        text_color=settings.Colors.BLACK.value,
-        active_color=settings.Colors.WHITE.value,
-        inactive_color=settings.Colors.BLACK.value,
+        text_color=settings.COLORS["black"].rgb(),
+        active_color=settings.COLORS["white"].rgb(),
+        inactive_color=settings.COLORS["black"].rgb(),
         y=settings.SCREEN_SIZE.y - 300,
         prompt_text="",
         numeric_only=True,
@@ -302,10 +302,10 @@ def time_trial(game_args):
 
     equations = iter(functions.get_all_equations(operator, num_operations, num_digits))
     current_equation = next(equations)
-    background_color = copy(settings.Colors.BACKGROUND.value)
+    background_color = copy(settings.COLORS["background"])
     # TODO: maybe named tuple for background color and RGB
-    red_step = int((background_color[0]) / num_operations)
-    green_step = int((255 - background_color[1]) / num_operations)
+    red_step = int((background_color.red) / num_operations)
+    green_step = int((255 - background_color.green) / num_operations)
 
     start = time.time()
 
@@ -316,7 +316,7 @@ def time_trial(game_args):
     flash_timer = time.time()
     while run:
         elapsed_time = f"{time.time() - start:.2f}"
-        screen.fill(background_color)
+        screen.fill(background_color.rgb())
         functions.draw_text(
             text="Time trial",
             font=settings.main_font,
@@ -327,9 +327,11 @@ def time_trial(game_args):
             input_field.get_event(event)
             if len(input_field.user_input) == len(str(current_equation[2])):
                 if functions.is_equal(input_field.user_input, current_equation[2]):
-                    background_color[0] = max(background_color[0] - green_step, 0)
-                    background_color[1] = min(background_color[1] + green_step, 255)
-                    background_color[2] = max(background_color[2] - green_step, 0)
+                    background_color.red = max(background_color.red - green_step, 0)
+                    background_color.green = min(
+                        background_color.green + green_step, 255
+                    )
+                    background_color.blue = max(background_color.blue - green_step, 0)
                     current_equation_index += 1
                     try:
                         flash_timer = time.time()
@@ -337,9 +339,9 @@ def time_trial(game_args):
                     except StopIteration as _:
                         run = results(background_color, elapsed_time, game_args)
                 else:
-                    background_color[0] = min(background_color[0] + red_step, 255)
-                    background_color[1] = max(background_color[1] - red_step, 0)
-                    background_color[2] = max(background_color[2] - red_step, 0)
+                    background_color.red = min(background_color.red + red_step, 255)
+                    background_color.green = max(background_color.green - red_step, 0)
+                    background_color.blue = max(background_color.blue - red_step, 0)
 
                 input_field.user_input = ""
 
@@ -377,15 +379,15 @@ def time_trial(game_args):
         pygame.display.update()
 
 
-def results(background_color, elapsed_time, game_args):
+def results(background_color: settings.Color, elapsed_time, game_args):
     run = True
 
     first_button_y = settings.SCREEN_SIZE.y - 300
     input_field = TextField(
         font=settings.main_font_small,
-        text_color=settings.Colors.BLACK.value,
-        active_color=settings.Colors.WHITE.value,
-        inactive_color=settings.Colors.BLACK.value,
+        text_color=settings.COLORS["black"].rgb(),
+        active_color=settings.COLORS["white"].rgb(),
+        inactive_color=settings.COLORS["black"].rgb(),
         y=first_button_y,
         prompt_text="",
     )
@@ -402,7 +404,7 @@ def results(background_color, elapsed_time, game_args):
     button_layout = ButtonLayout([save_button, try_again_button])
     navigation = Navigation([button_layout])
     while run:
-        screen.fill(background_color)
+        screen.fill(background_color.rgb())
         functions.draw_text(
             text=elapsed_time,
             font=settings.main_font,
@@ -476,7 +478,7 @@ def countdown_menu():
     navigation = defaultdict(tuple, nav)
     layout = Navigation([start_layout, options_layout], navigation)
     while run:
-        screen.fill(settings.Colors.BACKGROUND.value)
+        screen.fill(settings.COLORS["background"].rgb())
         functions.draw_text(
             text="Countdown",
             font=settings.main_font,
@@ -525,7 +527,7 @@ def countdown(n_big):
         y=settings.SCREEN_SIZE.mid_y,
         distance=100,
         orientation=Orientation.HORIZONTAL,
-        inactive_color=settings.Colors.WHITE.value,
+        inactive_color=settings.COLORS["white"].rgb(),
     )
 
     next_button = Button(
@@ -537,7 +539,7 @@ def countdown(n_big):
     timer_event = pygame.USEREVENT + 1
     pygame.time.set_timer(timer_event, 1000)
     counter = 30
-    background_color = settings.Colors.BACKGROUND.value
+    background_color = settings.COLORS["background"].rgb()
     button_layout = ButtonLayout([next_button])
     navigation = Navigation([button_layout])
     while run:
@@ -576,7 +578,7 @@ def countdown(n_big):
                 counter -= 1
                 if counter == 0:
                     pygame.time.set_timer(timer_event, 0)
-                    background_color = settings.Colors.GRAY.value
+                    background_color = settings.COLORS["gray"].rgb()
         numbers_layout.display(screen)
         next_button.draw(screen)
 

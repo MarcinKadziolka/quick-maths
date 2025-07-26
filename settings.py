@@ -1,6 +1,7 @@
-from dataclasses import dataclass
-import pygame
+from dataclasses import dataclass, field
 from enum import Enum
+
+import pygame
 
 pygame.init()
 
@@ -48,11 +49,22 @@ main_font_small = pygame.font.Font("./fonts/rasa.ttf", 50)
 equation_font_small = pygame.font.Font("./fonts/rasa.ttf", 70)
 
 
-class Colors(Enum):
-    BACKGROUND = [167, 199, 250]
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
-    GREEN = (127, 255, 212)
-    LIGHT_GREEN = (179, 255, 230)
-    LIGHT_RED = (180, 190, 250)
-    GRAY = (220, 220, 220)
+@dataclass
+class Color:
+    red: int
+    green: int
+    blue: int
+
+    def rgb(self):
+        return (self.red, self.green, self.blue)
+
+
+COLORS = {
+    "background": Color(167, 199, 250),
+    "white": Color(255, 255, 255),
+    "black": Color(0, 0, 0),
+    "green": Color(127, 255, 212),
+    "light_green": Color(179, 255, 230),
+    "light_red": Color(180, 190, 250),
+    "gray": Color(220, 220, 220),
+}
