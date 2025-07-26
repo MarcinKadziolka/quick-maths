@@ -60,7 +60,7 @@ def get_all_equations(operator, n: int, digits: int) -> list[tuple]:
 
 
 # TODO: validate answer
-def check_equation(answer: str, result: int) -> bool:
+def is_equal(answer: str, result: int) -> bool:
     if answer == "":
         return False
     try:
