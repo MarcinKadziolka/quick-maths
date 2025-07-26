@@ -48,7 +48,7 @@ main_font_small = pygame.font.Font("./fonts/rasa.ttf", 50)
 equation_font_small = pygame.font.Font("./fonts/rasa.ttf", 70)
 
 
-class Color(Enum):
+class Colors(Enum):
     BACKGROUND = [167, 199, 250]
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
