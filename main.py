@@ -290,7 +290,7 @@ def time_trial(game_args):
         active=True,
     )
     run = True
-    n = game_args["num_operations"]
+    num_operations = game_args["num_operations"]
     operator = functions.operation_to_operator[game_args["mode"]]
     num_digits = game_args["num_digits"]
     flash_time = game_args["flash"]
@@ -300,16 +300,16 @@ def time_trial(game_args):
     else:
         flash_time = settings.FLASH_TIME
 
-    equations = iter(functions.get_all_equations(operator, n, num_digits))
+    equations = iter(functions.get_all_equations(operator, num_operations, num_digits))
     current_equation = next(equations)
     background_color = copy(settings.Color.BACKGROUND.value)
     # TODO: maybe named tuple for background color and RGB
-    red_step = int((background_color[0]) / n)
-    green_step = int((255 - background_color[1]) / n)
+    red_step = int((background_color[0]) / num_operations)
+    green_step = int((255 - background_color[1]) / num_operations)
 
     start = time.time()
 
-    num_equations = n
+    num_equations = num_operations
     current_equation_index = 1
 
     answer_button.current = True
